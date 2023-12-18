@@ -1,9 +1,15 @@
 package com.fufa.fariska.controllers;
 
+import com.fufa.fariska.dto.GameDto;
+import com.fufa.fariska.dto.GameRequestDto;
 import com.fufa.fariska.entities.Game;
+import com.fufa.fariska.entities.User;
+import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.services.GameService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +29,14 @@ public class GameController {
     }
 
     @PostMapping("/games")
-    public Game createGame(@RequestBody Game game) {
-        return gameService.makeNewGame(game);
+    public GameDto createGame(@AuthenticationPrincipal User user, @RequestBody GameRequestDto gameRequestDto) {
+        Game newGame = gameService.makeNewGame(gameRequestDto, user);
+        return GameDto.builder()
+                .id(newGame.getId())
+                .create_time(newGame.getCreate_time())
+                .creator(newGame.getCreator())
+                .status(newGame.getStatus())
+                .players(newGame.getPlayers())
+                .build();
     }
-
-
-
 }

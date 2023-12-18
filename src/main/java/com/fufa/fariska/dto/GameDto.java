@@ -1,23 +1,19 @@
-package com.fufa.fariska.entities;
+package com.fufa.fariska.dto;
 
+import com.fufa.fariska.entities.User;
 import com.fufa.fariska.entities.enums.GameStatus;
-import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
-import java.util.Set;
 
 @SuperBuilder
 @Data
-public class Game {
+public class GameDto {
     private long id;
     private Instant create_time;
     private User creator;
     private GameStatus status;
     private int[] players;
     private int currentRound;
-    private int leader;
-    private Set<Integer> packs;
-    private Set<Long> cards;
 }
