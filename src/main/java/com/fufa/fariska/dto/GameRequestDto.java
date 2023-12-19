@@ -9,5 +9,5 @@ import java.util.Set;
 @Data
 public class GameRequestDto {
 
-    Set<Integer> packs;
+    Set<Integer> packsId;
 }

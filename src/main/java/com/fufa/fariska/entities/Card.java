@@ -1,10 +1,15 @@
 package com.fufa.fariska.entities;
 
+import lombok.Data;
+import lombok.experimental.SuperBuilder;
+
 import java.io.File;
 
+@SuperBuilder
+@Data
 public class Card {
-    int packId;
-    int number;
-    String name;
-    File picture;
+    private int packId;
+    private int number;
+    private String name;
+    private File picture;
 }

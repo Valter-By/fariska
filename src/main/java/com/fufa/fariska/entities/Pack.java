@@ -1,10 +1,15 @@
 package com.fufa.fariska.entities;
 
+import lombok.Data;
+import lombok.experimental.SuperBuilder;
+
 import java.util.Set;
 
+@SuperBuilder
+@Data
 public class Pack {
-    int id;
-    User owner;
-    Set<Card> cards;
-    String name;
+    private int id;
+    private int ownerId;
+    private Set<Card> cards;
+    private String name;
 }

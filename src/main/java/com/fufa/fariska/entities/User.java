@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Data
 public class User {
-    int id;
-    String gmail;
-    String name;
+    private int id;
+    private String gmail;
+    private String name;
 }
