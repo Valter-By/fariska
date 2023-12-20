@@ -1,11 +1,15 @@
 package com.fufa.fariska.entities;
 
 import com.fufa.fariska.entities.enums.RoundStatus;
+import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Map;
 
+@SuperBuilder
+@Data
 public class Round {
-    private Game game;
+    private int gameId;
     private int number;
     private Player leader;
     private Card leaderCard;

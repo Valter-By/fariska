@@ -4,6 +4,7 @@ import com.fufa.fariska.entities.enums.Avatar;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
 import java.util.Set;
 
 @SuperBuilder
@@ -11,8 +12,9 @@ import java.util.Set;
 public class Player {
     private User user;
     private int gameId;
+    private int place;
     private Avatar avatar;
-    private Set<Card> handCards;
+    private List<Card> handCards;
     private boolean isLeader;
     private int points;
 }

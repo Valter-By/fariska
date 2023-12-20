@@ -20,7 +20,7 @@ public class Game {
     private User creator;
     private GameStatus status;
     private List<Player> players;
-    private int currentRound;
+    private Round currentRound;
     private int leader;
     private Set<Integer> packsId;
     private List<Card> cards;
@@ -29,5 +29,20 @@ public class Game {
     public Avatar getFreeAvatar() {
         return freeAvatars.removeLast();
     }
+
+    public void dealCards() {
+        for(Player player : players) {
+            player.setHandCards(this.takeSomeCards(6));
+        }
+    }
+
+    public List<Card> takeSomeCards(int n) {
+        LinkedList<Card> ans = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            ans.add(cards.remove(i));
+        }
+        return ans;
+    }
+
 
 }
