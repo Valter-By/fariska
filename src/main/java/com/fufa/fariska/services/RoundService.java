@@ -10,7 +10,7 @@ public class RoundService {
     GameService gameService;
 
     public synchronized Round startNewRound() {
-
+        return Round.builder().build();
     }
 
 }

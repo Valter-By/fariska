@@ -21,7 +21,7 @@ public class GameController {
 
     @GetMapping("/games")
     public List<Game> getCreatedGames() {
-        return gameService.findAllCreatedGames();
+        return gameService.findAllCreatedGames(); // may be return just don't finished games in Map by id
     }
 
     @GetMapping("/games/{id}")
@@ -52,4 +52,6 @@ public class GameController {
 
         return gameService.startGame(user, gameId);                 // make DTO
     }
+
+
 }
