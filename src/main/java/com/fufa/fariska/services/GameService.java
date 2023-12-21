@@ -2,6 +2,7 @@ package com.fufa.fariska.services;
 
 import com.fufa.fariska.dto.GameDto;
 import com.fufa.fariska.dto.GameRequestDto;
+import com.fufa.fariska.dto.SecretRequestDto;
 import com.fufa.fariska.entities.*;
 import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
@@ -86,17 +87,43 @@ public class GameService {
         List<Player> players = game.getPlayers();
         putPlayersOnTheirPlaces(players);
         game.setLeader(0);
-        game.dealCards();
+        game.dealCards(); //can deal for each when create
 
         Round round = Round.builder()
                 .gameId(gameId)
                 .number(1)
                 .leader(players.get(0))
-                .status(RoundStatus.DEALING)
+                .status(RoundStatus.WRITING_SECRET)
                 .build();
 
         game.setCurrentRound(round);
         game.setStatus(GameStatus.PLAYING);
+        return game;
+    }
+
+    public synchronized Game makeSecret(User user, int gameId, SecretRequestDto secretRequestDto) {
+        Game game = createdGames.get(gameId);
+//        int leader = game.getLeader();
+
+        if (user.getId() != game.getLeader() || game.getStatus() != GameStatus.PLAYING) {
+            return null;                                     // make exception
+        }
+
+        Round round = game.getCurrentRound();
+
+        if (round.getStatus() != RoundStatus.WRITING_SECRET) {
+            return null;                                     // make exception
+        }
+
+        List<Player> players = game.getPlayers();
+        Player leader = round.getLeader();
+
+        round.setLeaderCard(leader.getHandCards().get(secretRequestDto.getCardHandNumber()));
+        round.setSecret(secretRequestDto.getSecret());
+
+        leader.getHandCards().add(game.takeSomeCards(1).get(0));
+
+        round.setStatus(RoundStatus.MAKING_MOVIES);
         return game;
     }
 
