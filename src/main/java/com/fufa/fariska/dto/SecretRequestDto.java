@@ -13,5 +13,6 @@ import java.util.List;
 @Data
 public class SecretRequestDto {
     private String secret;
+    private int round;
     private int cardHandNumber;
 }

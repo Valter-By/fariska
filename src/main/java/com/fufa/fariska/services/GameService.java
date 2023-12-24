@@ -2,6 +2,7 @@ package com.fufa.fariska.services;
 
 import com.fufa.fariska.dto.GameDto;
 import com.fufa.fariska.dto.GameRequestDto;
+import com.fufa.fariska.dto.MoveRequestDto;
 import com.fufa.fariska.dto.SecretRequestDto;
 import com.fufa.fariska.entities.*;
 import com.fufa.fariska.entities.enums.Avatar;
@@ -93,6 +94,7 @@ public class GameService {
                 .gameId(gameId)
                 .number(1)
                 .leader(players.get(0))
+                .playerMoves(new ArrayList<>(9))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
 
@@ -103,27 +105,56 @@ public class GameService {
 
     public synchronized Game makeSecret(User user, int gameId, SecretRequestDto secretRequestDto) {
         Game game = createdGames.get(gameId);
-//        int leader = game.getLeader();
+        Round round = game.getCurrentRound();
 
-        if (user.getId() != game.getLeader() || game.getStatus() != GameStatus.PLAYING) {
+        if (user.getId() != game.getLeader() || round.getNumber() != secretRequestDto.getRound() || game.getStatus() != GameStatus.PLAYING) {
             return null;                                     // make exception
         }
-
-        Round round = game.getCurrentRound();
 
         if (round.getStatus() != RoundStatus.WRITING_SECRET) {
             return null;                                     // make exception
         }
 
-        List<Player> players = game.getPlayers();
         Player leader = round.getLeader();
 
-        round.setLeaderCard(leader.getHandCards().get(secretRequestDto.getCardHandNumber()));
+        Card leaderCard = leader.getHandCards().remove(secretRequestDto.getCardHandNumber());
+        round.setLeaderCard(leaderCard);
+        round.getPlayerMoves().add(Move.builder().placePlayer(game.getLeader()).card(leaderCard).build());
         round.setSecret(secretRequestDto.getSecret());
 
-        leader.getHandCards().add(game.takeSomeCards(1).get(0));
+        leader.getHandCards().add(game.takeSomeCards(1).get(0)); // make method to take one card
 
         round.setStatus(RoundStatus.MAKING_MOVIES);
+        return game;
+    }
+
+    public synchronized Game makeMove(User user, int gameId, MoveRequestDto moveRequestDto) {
+        Game game = createdGames.get(gameId);
+        Round round = game.getCurrentRound();
+        int place = moveRequestDto.getPlayerPlace();
+
+
+        if (game.getPlayers().get(place).getUser().getId() != user.getId()) {
+            return null;                                     // make exception
+        }
+
+        if (round.getNumber() != moveRequestDto.getRound() || game.getStatus() != GameStatus.PLAYING
+        || round.getStatus() != RoundStatus.MAKING_MOVIES) {
+            return null;                                     // make exception
+        }
+
+        List<Player> players = game.getPlayers();
+        Player player = players.get(place);
+        Card card = player.getHandCards().remove(moveRequestDto.getCardHandNumber());
+        round.getPlayerMoves().add(Move.builder().placePlayer(place).card(card).build());
+
+        player.getHandCards().add(game.takeSomeCards(1).get(0)); // make method to take one card
+
+        if(game.getPlayers().size() == round.getPlayerMoves().size()) {
+            Collections.shuffle(round.getPlayerMoves());
+            round.setStatus(RoundStatus.VOTING);
+        }
+
         return game;
     }
 
@@ -145,6 +176,7 @@ public class GameService {
             players.get(i).setPlace(i);
         }
     }
+
 
 
 

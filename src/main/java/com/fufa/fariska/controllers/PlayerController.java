@@ -20,6 +20,6 @@ public class PlayerController {
 
     @PostMapping("/players")
     public Player createPlayer(@RequestBody Player player) {
-        return new Player();
+        return Player.builder().build();
     }
 }

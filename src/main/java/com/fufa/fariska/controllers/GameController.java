@@ -2,6 +2,7 @@ package com.fufa.fariska.controllers;
 
 import com.fufa.fariska.dto.GameDto;
 import com.fufa.fariska.dto.GameRequestDto;
+import com.fufa.fariska.dto.MoveRequestDto;
 import com.fufa.fariska.dto.SecretRequestDto;
 import com.fufa.fariska.entities.Game;
 import com.fufa.fariska.entities.Player;
@@ -26,8 +27,8 @@ public class GameController {
     }
 
     @GetMapping("/games/{id}")
-    public String getGame(@PathVariable int id) {
-        return "Game " + id;
+    public Game getGame(@PathVariable int id) {
+        return gameService.findGame(id);
     } //return GameDTO?
 
     @PostMapping("/games")
@@ -58,8 +59,17 @@ public class GameController {
     public Game createSecret(@AuthenticationPrincipal User user, @PathVariable int gameId,
                              @RequestBody SecretRequestDto secretRequestDto) {
 
-        return gameService.startGame(user, gameId);                 // make DTO
+        return gameService.makeSecret(user, gameId, secretRequestDto);                 // make DTO
     }
+
+    @PostMapping("/games/{id}/move")
+    public Game createMove(@AuthenticationPrincipal User user, @PathVariable int gameId,
+                             @RequestBody MoveRequestDto secretRequestDto) {
+
+        return gameService.makeMove(user, gameId, secretRequestDto);                 // make DTO
+    }
+
+
 
 
 }

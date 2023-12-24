@@ -20,6 +20,6 @@ public class PackController {
 
     @PostMapping("/packs")
     public Pack createPack(@RequestBody Pack pack) {
-        return new Pack();
+        return Pack.builder().build();
     }
 }

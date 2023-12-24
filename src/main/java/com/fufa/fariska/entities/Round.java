@@ -4,6 +4,7 @@ import com.fufa.fariska.entities.enums.RoundStatus;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
 import java.util.Map;
 
 @SuperBuilder
@@ -14,8 +15,13 @@ public class Round {
     private Player leader;
     private Card leaderCard;
     private String secret;
-    private Map<Integer, Card> playerCards;
+    private List<Move> playerMoves;
+    private List<Boolean> playerMoved;
     private Map<Integer, Card> playerVotes;
     private Map<Integer, Integer> playerPoints;
     private RoundStatus status;
+
+    public void putCardOnTable(Card card) {
+
+    }
 }

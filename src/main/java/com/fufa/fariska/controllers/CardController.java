@@ -20,6 +20,6 @@ public class CardController {
 
     @PostMapping("/cards")
     public Card createCard(@RequestBody Card card) {
-        return new Card();
+        return Card.builder().build();
     }
 }
