@@ -1,6 +1,7 @@
 package com.fufa.fariska.services;
 
 import com.fufa.fariska.entities.Card;
+import com.fufa.fariska.entities.Move;
 import org.testcontainers.shaded.com.google.common.cache.Cache;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ public class GameServiceTests {
 
         List<Card> cards = new ArrayList<>(9);
         cards.add(0, Card.builder().name("Test").build());
-        System.out.println(cards);
+
+        System.out.println(new Move[9]);
     }
 }

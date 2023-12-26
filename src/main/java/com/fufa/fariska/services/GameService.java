@@ -94,7 +94,8 @@ public class GameService {
                 .gameId(gameId)
                 .number(1)
                 .leader(players.get(0))
-                .playerMoves(new ArrayList<>(9))
+                .playerMoves(new Card[9])
+//                .playersMoved(List.of(new Boolean[9]))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
 
@@ -116,10 +117,13 @@ public class GameService {
         }
 
         Player leader = round.getLeader();
+        int leaderPlace = game.getLeader();
 
         Card leaderCard = leader.getHandCards().remove(secretRequestDto.getCardHandNumber());
         round.setLeaderCard(leaderCard);
-        round.getPlayerMoves().add(Move.builder().placePlayer(game.getLeader()).card(leaderCard).build());
+
+        round.putCardOnTable(leaderPlace, leaderCard);
+
         round.setSecret(secretRequestDto.getSecret());
 
         leader.getHandCards().add(game.takeSomeCards(1).get(0)); // make method to take one card
@@ -143,15 +147,21 @@ public class GameService {
             return null;                                     // make exception
         }
 
+        if (round.getPlayersMoved().get(place)) {
+            return null;                                     // make exception
+        }
+
         List<Player> players = game.getPlayers();
         Player player = players.get(place);
         Card card = player.getHandCards().remove(moveRequestDto.getCardHandNumber());
-        round.getPlayerMoves().add(Move.builder().placePlayer(place).card(card).build());
+
+        round.putCardOnTable(place, card);
 
         player.getHandCards().add(game.takeSomeCards(1).get(0)); // make method to take one card
 
-        if(game.getPlayers().size() == round.getPlayerMoves().size()) {
-            Collections.shuffle(round.getPlayerMoves());
+        if (game.getPlayers().size() == countMovedPlayers(round.getPlayerMoves())) {
+            ArrayList<Card> list = (ArrayList<Card>) List.of(round.getPlayerMoves());
+            Collections.shuffle(list);
             round.setStatus(RoundStatus.VOTING);
         }
 
@@ -175,6 +185,16 @@ public class GameService {
         for (int i = 0; i < players.size(); i++) {
             players.get(i).setPlace(i);
         }
+    }
+
+    private synchronized int countMovedPlayers(Card[] cards) {
+        int ans = 0;
+        for (Card card : cards) {
+            if (card != null) {
+                ans++;
+            }
+        }
+        return ans;
     }
 
 

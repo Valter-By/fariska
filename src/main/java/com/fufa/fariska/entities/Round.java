@@ -15,13 +15,21 @@ public class Round {
     private Player leader;
     private Card leaderCard;
     private String secret;
-    private List<Move> playerMoves;
-    private List<Boolean> playerMoved;
+//    private Card[] playerMoves; - lost info about player place
+    private Move[] playerMoves;
+//    private List<Move> playerMoves;
+    private List<Boolean> playersMoved; // may be not necessary
     private Map<Integer, Card> playerVotes;
     private Map<Integer, Integer> playerPoints;
     private RoundStatus status;
 
-    public void putCardOnTable(Card card) {
-
+    public void putCardOnTable(int place, Card card) {
+        Move[] moves = this.getPlayerMoves();
+        moves[place] = Move.builder()
+                .placePlayer(place)
+                .card(card)
+                .build();
     }
+
+
 }
