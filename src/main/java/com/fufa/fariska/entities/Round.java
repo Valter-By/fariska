@@ -16,19 +16,19 @@ public class Round {
     private Card leaderCard;
     private String secret;
 //    private Card[] playerMoves; - lost info about player place
-    private Move[] playerMoves;
-//    private List<Move> playerMoves;
-    private List<Boolean> playersMoved; // may be not necessary
+//    private Move[] playerMoves;
+    private int[] playerMoves;
+    private List<Move> tableCards;
+//    private List<Boolean> playersMoved; // may be not necessary
     private Map<Integer, Card> playerVotes;
     private Map<Integer, Integer> playerPoints;
     private RoundStatus status;
 
     public void putCardOnTable(int place, Card card) {
-        Move[] moves = this.getPlayerMoves();
-        moves[place] = Move.builder()
-                .placePlayer(place)
+        tableCards.add(place, Move.builder()
+                .playerPlace(place)
                 .card(card)
-                .build();
+                .build());
     }
 
 

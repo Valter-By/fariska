@@ -44,5 +44,9 @@ public class Game {
         return ans;
     }
 
+    public Card takeOneCard() {
+        return cards.remove(cards.size() - 1);
+    }
+
 
 }

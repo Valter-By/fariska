@@ -90,15 +90,16 @@ public class GameService {
         game.setLeader(0);
         game.dealCards(); //can deal for each when create
 
+//        Move[] moves = new Move[10];
+//        Arrays.fill(moves, null);
+
         Round round = Round.builder()
                 .gameId(gameId)
                 .number(1)
                 .leader(players.get(0))
-                .playerMoves(new Card[9])
-//                .playersMoved(List.of(new Boolean[9]))
+                .tableCards(List.of(new Move[10]))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
-
         game.setCurrentRound(round);
         game.setStatus(GameStatus.PLAYING);
         return game;
@@ -147,24 +148,20 @@ public class GameService {
             return null;                                     // make exception
         }
 
-        if (round.getPlayersMoved().get(place)) {
+        if (round.getTableCards().get(place) != null) {
             return null;                                     // make exception
         }
 
         List<Player> players = game.getPlayers();
         Player player = players.get(place);
-        Card card = player.getHandCards().remove(moveRequestDto.getCardHandNumber());
-
+        Card card = player.getOneCard(moveRequestDto.getCardHandNumber());
         round.putCardOnTable(place, card);
 
-        player.getHandCards().add(game.takeSomeCards(1).get(0)); // make method to take one card
+        player.takeOneCard(game.takeSomeCards(1).get(0)); // make method to take one card
 
-        if (game.getPlayers().size() == countMovedPlayers(round.getPlayerMoves())) {
-            ArrayList<Card> list = (ArrayList<Card>) List.of(round.getPlayerMoves());
-            Collections.shuffle(list);
-            round.setStatus(RoundStatus.VOTING);
+        if (game.getPlayers().size() <= (round.getTableCards().size())) {
+            endMoveAndStartVoting(round);
         }
-
         return game;
     }
 
@@ -187,14 +184,16 @@ public class GameService {
         }
     }
 
-    private synchronized int countMovedPlayers(Card[] cards) {
-        int ans = 0;
-        for (Card card : cards) {
-            if (card != null) {
-                ans++;
-            }
+    private void endMoveAndStartVoting(Round round) {
+        Collections.shuffle(round.getTableCards());
+        int[] movies = new int[10];
+        int cardPosition = 1;
+        for (Move move : round.getTableCards()) {
+            movies[move.getPlayerPlace()] = cardPosition++;
         }
-        return ans;
+        round.setPlayerMoves(movies);
+
+        round.setStatus(RoundStatus.VOTING);
     }
 
 

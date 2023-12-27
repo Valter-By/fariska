@@ -17,4 +17,12 @@ public class Player {
     private List<Card> handCards;
     private boolean isLeader;
     private int points;
+
+    public Card getOneCard(int number) {
+        return handCards.remove(number);
+    }
+
+    public void takeOneCard(Card card) {
+        handCards.add(card);
+    }
 }

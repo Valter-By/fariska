@@ -11,6 +11,6 @@ import java.io.File;
 @NoArgsConstructor
 public class Move {
 
-    private int placePlayer; // may be not necessary
+    private int playerPlace;
     private Card card;
 }
