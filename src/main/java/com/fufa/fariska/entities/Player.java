@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
-import java.util.Set;
 
 @SuperBuilder
 @Data
@@ -18,11 +17,15 @@ public class Player {
     private boolean isLeader;
     private int points;
 
-    public Card getOneCard(int number) {
+    public Card putOneCard(int number) {
         return handCards.remove(number);
     }
 
     public void takeOneCard(Card card) {
         handCards.add(card);
+    }
+
+    public void addPoints(int somePoints) {
+        points += somePoints;
     }
 }

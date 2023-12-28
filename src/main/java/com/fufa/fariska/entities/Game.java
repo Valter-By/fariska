@@ -48,5 +48,12 @@ public class Game {
         return cards.remove(cards.size() - 1);
     }
 
+    public void addAllPoints(int[] pointsArray) {
+        int i = 1;
+        for (Player player : players) {
+            player.addPoints(pointsArray[i++]);
+        }
+    }
+
 
 }

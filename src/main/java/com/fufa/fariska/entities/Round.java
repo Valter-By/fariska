@@ -14,14 +14,18 @@ public class Round {
     private int number;
     private Player leader;
     private Card leaderCard;
+    private int leaderCardNumber;
     private String secret;
 //    private Card[] playerMoves; - lost info about player place
 //    private Move[] playerMoves;
     private int[] playerMoves;
     private List<Move> tableCards;
-//    private List<Boolean> playersMoved; // may be not necessary
-    private Map<Integer, Card> playerVotes;
-    private Map<Integer, Integer> playerPoints;
+    private int numberMoves;
+    //    private List<Boolean> playersMoved; // may be not necessary
+    private int[] playerVotes;
+    private int numberVotes;
+//    private Map<Integer, Card> playerVotes;
+    private int[] playerPoints;
     private RoundStatus status;
 
     public void putCardOnTable(int place, Card card) {
@@ -29,6 +33,18 @@ public class Round {
                 .playerPlace(place)
                 .card(card)
                 .build());
+        numberMoves++;
+    }
+
+    public int findNumberLeaderCard() {
+        int ans = 0;
+        for (Move move : tableCards) {
+            ans++;
+            if (move.getCard().equals(leaderCard)) {
+                return ans;
+            }
+        }
+        return ans;
     }
 
 

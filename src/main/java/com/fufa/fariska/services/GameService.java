@@ -1,16 +1,14 @@
 package com.fufa.fariska.services;
 
-import com.fufa.fariska.dto.GameDto;
 import com.fufa.fariska.dto.GameRequestDto;
 import com.fufa.fariska.dto.MoveRequestDto;
 import com.fufa.fariska.dto.SecretRequestDto;
+import com.fufa.fariska.dto.VoteRequestDto;
 import com.fufa.fariska.entities.*;
-import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
 import com.fufa.fariska.repositories.GameRepository;
 import com.fufa.fariska.repositories.PackRepository;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -90,14 +88,11 @@ public class GameService {
         game.setLeader(0);
         game.dealCards(); //can deal for each when create
 
-//        Move[] moves = new Move[10];
-//        Arrays.fill(moves, null);
-
         Round round = Round.builder()
                 .gameId(gameId)
                 .number(1)
                 .leader(players.get(0))
-                .tableCards(List.of(new Move[10]))
+                .tableCards(List.of(new Move[players.size() + 1]))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
         game.setCurrentRound(round);
@@ -154,14 +149,77 @@ public class GameService {
 
         List<Player> players = game.getPlayers();
         Player player = players.get(place);
-        Card card = player.getOneCard(moveRequestDto.getCardHandNumber());
+        Card card = player.putOneCard(moveRequestDto.getCardHandNumber());
         round.putCardOnTable(place, card);
 
-        player.takeOneCard(game.takeSomeCards(1).get(0)); // make method to take one card
+        player.takeOneCard(game.takeOneCard());
 
-        if (game.getPlayers().size() <= (round.getTableCards().size())) {
+
+        if (game.getPlayers().size() <= (round.getNumberMoves())) {
             endMoveAndStartVoting(round);
         }
+        return game;
+    }
+
+    public synchronized Game makeVote(User user, int gameId, VoteRequestDto voteRequestDto) {
+        Game game = createdGames.get(gameId);
+        Round round = game.getCurrentRound();
+        int place = voteRequestDto.getPlayerPlace();
+
+        if (game.getPlayers().get(place).getUser().getId() != user.getId()) {
+            return null;                                     // make exception
+        }
+
+        if (round.getNumber() != voteRequestDto.getRound() || game.getStatus() != GameStatus.PLAYING
+                || round.getStatus() != RoundStatus.VOTING) {
+            return null;                                     // make exception
+        }
+
+        if (game.getLeader() == place) {
+            return null;                                     // make exception
+        }
+
+        if (round.getPlayerVotes()[place] != 0) {
+            return null;                                     // make exception
+        }
+
+        int vote = voteRequestDto.getCardTableNumber();
+
+        if (round.getPlayerMoves()[place] == vote) {
+            return null;                                     // make exception
+        }
+
+        round.getPlayerVotes()[place] = vote;
+        round.setNumberVotes(round.getNumberVotes() + 1);
+
+        if (game.getPlayers().size() <= round.getNumberVotes() + 1) {
+            game.addAllPoints(endVoteAndCalcPoints(round));
+            round.setStatus(RoundStatus.WAITING_FOR_NEXT_ROUND);
+        }
+
+        return game;
+    }
+
+    public synchronized Game startNextRound(User user, int gameId) {
+        Game game = createdGames.get(gameId); //how many players should press next? any? two? owner? all?
+//        if (user.getId() != game.getCreator().getId() || game.getPlayers().size() < 2 || game.getStatus() != GameStatus.WAITING_FOR_PLAYERS) {
+//            return null;                                     // make exception
+//        }
+//
+//        List<Player> players = game.getPlayers();
+//        putPlayersOnTheirPlaces(players);
+//        game.setLeader(0);
+//        game.dealCards(); //can deal for each when create
+//
+//        Round round = Round.builder()
+//                .gameId(gameId)
+//                .number(1)
+//                .leader(players.get(0))
+//                .tableCards(List.of(new Move[players.size() + 1]))
+//                .status(RoundStatus.WRITING_SECRET)
+//                .build();
+//        game.setCurrentRound(round);
+//        game.setStatus(GameStatus.PLAYING);
         return game;
     }
 
@@ -180,23 +238,51 @@ public class GameService {
         Collections.shuffle(players);
         players.get(0).setLeader(true);
         for (int i = 0; i < players.size(); i++) {
-            players.get(i).setPlace(i);
+            players.get(i).setPlace(i + 1);
         }
     }
 
     private void endMoveAndStartVoting(Round round) {
         Collections.shuffle(round.getTableCards());
-        int[] movies = new int[10];
+        int[] movies = new int[round.getTableCards().size() + 1];
         int cardPosition = 1;
         for (Move move : round.getTableCards()) {
             movies[move.getPlayerPlace()] = cardPosition++;
         }
         round.setPlayerMoves(movies);
 
+        int[] votes = new int[round.getTableCards().size() + 1];
+        round.setPlayerVotes(votes);
+
         round.setStatus(RoundStatus.VOTING);
+    }
+
+    private int[] endVoteAndCalcPoints(Round round) {
+        round.setStatus(RoundStatus.POINTS_CALC);
+        int[] votes = round.getPlayerVotes();
+        int number = votes.length;
+        int[] points = new int[number];
+
+        int leaderCardNumber = round.findNumberLeaderCard();
+        int numberGuessedLeaderCard = 0;
+
+        for (int i = 1; i < number; i++ ) {
+            if (votes[i] == leaderCardNumber) {
+                numberGuessedLeaderCard++;
+                points[i] += 3;
+            } else {
+                points[round.getTableCards().get(votes[i]).getPlayerPlace()] += 1;
+            }
+        }
+        if (numberGuessedLeaderCard > 0 && numberGuessedLeaderCard < number - 1) {
+            points[round.getLeader().getPlace()] += 3 + numberGuessedLeaderCard;
+        }
+        round.setPlayerPoints(points);
+        return points;
     }
 
 
 
 
-}
+
+    }
