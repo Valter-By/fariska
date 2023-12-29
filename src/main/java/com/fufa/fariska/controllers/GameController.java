@@ -1,9 +1,6 @@
 package com.fufa.fariska.controllers;
 
-import com.fufa.fariska.dto.GameDto;
-import com.fufa.fariska.dto.GameRequestDto;
-import com.fufa.fariska.dto.MoveRequestDto;
-import com.fufa.fariska.dto.SecretRequestDto;
+import com.fufa.fariska.dto.*;
 import com.fufa.fariska.entities.Game;
 import com.fufa.fariska.entities.Player;
 import com.fufa.fariska.entities.User;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class GameController {
@@ -22,7 +20,7 @@ public class GameController {
     public GameService gameService;
 
     @GetMapping("/games")
-    public List<Game> getCreatedGames() {
+    public Map<Integer, Game> getCreatedGames() {
         return gameService.findAllCreatedGames(); // may be return just don't finished games in Map by id
     }
 
@@ -67,6 +65,19 @@ public class GameController {
                              @RequestBody MoveRequestDto secretRequestDto) {
 
         return gameService.makeMove(user, gameId, secretRequestDto);                 // make DTO
+    }
+
+    @PostMapping("/games/{id}/vote")
+    public Game createVote(@AuthenticationPrincipal User user, @PathVariable int gameId,
+                           @RequestBody VoteRequestDto voteRequestDto) {
+
+        return gameService.makeVote(user, gameId, voteRequestDto);                 // make DTO
+    }
+
+    @PostMapping("/games/{id}/next")
+    public Game createNextRound(@AuthenticationPrincipal User user, @PathVariable int gameId) {
+
+        return gameService.startNextRound(user, gameId);                 // make DTO
     }
 
 

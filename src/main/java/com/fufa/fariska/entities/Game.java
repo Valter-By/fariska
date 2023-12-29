@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +22,7 @@ public class Game {
     private Round currentRound;
     private int leader;
     private Set<Integer> packsId;
-    private List<Card> cards;
+    private LinkedList<Card> cards;
     private LinkedList<Avatar> freeAvatars;
 
     public Avatar getFreeAvatar() {
@@ -36,16 +35,29 @@ public class Game {
         }
     }
 
-    public List<Card> takeSomeCards(int n) {
+    public LinkedList<Card> takeSomeCards(int n) {
+
+        int m = cards.size();
+        if (m <= n) {
+            currentRound.setLastRound(true);
+            if (m == 0) {
+                return null;
+            }
+            n = m;
+        }
         LinkedList<Card> ans = new LinkedList<>();
         for (int i = 0; i < n; i++) {
-            ans.add(cards.remove(i));
+            ans.add(cards.removeLast());
         }
         return ans;
     }
 
     public Card takeOneCard() {
-        return cards.remove(cards.size() - 1);
+        if (cards.isEmpty()) {
+            currentRound.setLastRound(true);
+            return null;
+        }
+        return cards.removeLast();
     }
 
     public void addAllPoints(int[] pointsArray) {
@@ -53,6 +65,20 @@ public class Game {
         for (Player player : players) {
             player.addPoints(pointsArray[i++]);
         }
+    }
+
+    public int getNextLeader() {
+        if (leader < players.size()) {
+            leader +=1;
+        } else {
+            leader = 1;
+        }
+        return leader;
+    }
+
+    public Game finish() {
+        status = GameStatus.GAME_OVER;
+        return this;
     }
 
 

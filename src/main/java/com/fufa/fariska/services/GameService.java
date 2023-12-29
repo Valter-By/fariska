@@ -18,17 +18,15 @@ import java.util.*;
 public class GameService {
     public GameRepository gameRepository;
     public PackRepository packRepository;
-    private int totalGames;
-    private Map<Integer, Game> currentGames;
-
-    public List<Game> createdGames;
+    private static int totalGames;
+    private Map<Integer, Game> createdGames;
 
     public synchronized Game makeNewGame(GameRequestDto gameRequestDto, User user) {
         int gameId = ++totalGames;
 
         Set<Integer> packsId = gameRequestDto.getPacksId();
         Set<Pack> packs = packRepository.getPacks(packsId);
-        List<Card> cards = collectAllCardsAndShuffle(packs);
+        LinkedList<Card> cards = collectAllCardsAndShuffle(packs);
 
         Game game = Game.builder()
                 .id(gameId)
@@ -47,15 +45,16 @@ public class GameService {
                 .build());
         game.setPlayers(players);
 
+        createdGames.put(gameId, game);
+
         return game;
     }
 
     public Game findGame(final int id) {
-
         return createdGames.get(id);
     }
 
-    public synchronized List<Game> findAllCreatedGames() {
+    public synchronized Map<Integer, Game> findAllCreatedGames() {
         return createdGames;
     }
 
@@ -78,6 +77,7 @@ public class GameService {
     }
 
     public synchronized Game startGame(User user, int gameId) {
+
         Game game = createdGames.get(gameId);
         if (user.getId() != game.getCreator().getId() || game.getPlayers().size() < 2 || game.getStatus() != GameStatus.WAITING_FOR_PLAYERS) {
             return null;                                     // make exception
@@ -85,7 +85,7 @@ public class GameService {
 
         List<Player> players = game.getPlayers();
         putPlayersOnTheirPlaces(players);
-        game.setLeader(0);
+        game.setLeader(1);
         game.dealCards(); //can deal for each when create
 
         Round round = Round.builder()
@@ -101,6 +101,7 @@ public class GameService {
     }
 
     public synchronized Game makeSecret(User user, int gameId, SecretRequestDto secretRequestDto) {
+
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
 
@@ -129,6 +130,7 @@ public class GameService {
     }
 
     public synchronized Game makeMove(User user, int gameId, MoveRequestDto moveRequestDto) {
+
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
         int place = moveRequestDto.getPlayerPlace();
@@ -162,6 +164,7 @@ public class GameService {
     }
 
     public synchronized Game makeVote(User user, int gameId, VoteRequestDto voteRequestDto) {
+
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
         int place = voteRequestDto.getPlayerPlace();
@@ -201,32 +204,36 @@ public class GameService {
     }
 
     public synchronized Game startNextRound(User user, int gameId) {
-        Game game = createdGames.get(gameId); //how many players should press next? any? two? owner? all?
-//        if (user.getId() != game.getCreator().getId() || game.getPlayers().size() < 2 || game.getStatus() != GameStatus.WAITING_FOR_PLAYERS) {
-//            return null;                                     // make exception
-//        }
-//
-//        List<Player> players = game.getPlayers();
-//        putPlayersOnTheirPlaces(players);
-//        game.setLeader(0);
-//        game.dealCards(); //can deal for each when create
-//
-//        Round round = Round.builder()
-//                .gameId(gameId)
-//                .number(1)
-//                .leader(players.get(0))
-//                .tableCards(List.of(new Move[players.size() + 1]))
-//                .status(RoundStatus.WRITING_SECRET)
-//                .build();
-//        game.setCurrentRound(round);
-//        game.setStatus(GameStatus.PLAYING);
+
+        Game game = createdGames.get(gameId);
+
+        if (game.getStatus() != GameStatus.PLAYING
+                || game.getCurrentRound().getStatus() != RoundStatus.WAITING_FOR_NEXT_ROUND) {
+            return null;                                     // make exception
+        }
+
+        if (game.getCurrentRound().isLastRound()) {
+            return game.finish();
+        }
+
+        List<Player> players = game.getPlayers();
+
+        Round round = Round.builder()
+                .gameId(gameId)
+                .number(game.getCurrentRound().getNumber() + 1)
+                .leader(players.get(game.getNextLeader() - 1))
+                .tableCards(List.of(new Move[players.size() + 1]))
+                .status(RoundStatus.WRITING_SECRET)
+                .build();
+        game.setCurrentRound(round);
         return game;
     }
 
 
 
-    private synchronized List<Card> collectAllCardsAndShuffle(Set<Pack> packs) {
-        List<Card> cards = new LinkedList<>();
+    private synchronized LinkedList<Card> collectAllCardsAndShuffle(Set<Pack> packs) {
+
+        LinkedList<Card> cards = new LinkedList<>();
         for (Pack pack : packs) {
             cards.addAll(pack.getCards());
         }
@@ -235,6 +242,7 @@ public class GameService {
     }
 
     private synchronized void putPlayersOnTheirPlaces(List<Player> players) {
+
         Collections.shuffle(players);
         players.get(0).setLeader(true);
         for (int i = 0; i < players.size(); i++) {
@@ -243,6 +251,7 @@ public class GameService {
     }
 
     private void endMoveAndStartVoting(Round round) {
+
         Collections.shuffle(round.getTableCards());
         int[] movies = new int[round.getTableCards().size() + 1];
         int cardPosition = 1;
@@ -258,6 +267,7 @@ public class GameService {
     }
 
     private int[] endVoteAndCalcPoints(Round round) {
+
         round.setStatus(RoundStatus.POINTS_CALC);
         int[] votes = round.getPlayerVotes();
         int number = votes.length;
