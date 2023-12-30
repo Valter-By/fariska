@@ -5,6 +5,7 @@ import com.fufa.fariska.dto.MoveRequestDto;
 import com.fufa.fariska.dto.SecretRequestDto;
 import com.fufa.fariska.dto.VoteRequestDto;
 import com.fufa.fariska.entities.*;
+import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
 import com.fufa.fariska.repositories.GameRepository;
@@ -35,6 +36,7 @@ public class GameService {
                 .status(GameStatus.WAITING_FOR_PLAYERS)
                 .packsId(packsId)
                 .cards(cards)
+                .freeAvatars(Avatar.getAll())
                 .build();
         List<Player> players = new ArrayList<>();
 

@@ -1,6 +1,7 @@
 package com.fufa.fariska.entities.enums;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -11,9 +12,9 @@ public enum Avatar {
     PINK_ELEPHANT,
     BLACK_CAT;
 
-    public static List<Avatar> getAll() {
+    public static LinkedList<Avatar> getAll() {
         Avatar[] avatars = values();
-        List<Avatar> list = List.of(avatars);
+        LinkedList<Avatar> list = new LinkedList<>(List.of(avatars));
         Collections.shuffle(list);
         return list;
     }

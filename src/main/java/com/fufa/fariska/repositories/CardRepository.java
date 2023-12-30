@@ -10,9 +10,10 @@ import java.util.*;
 @Repository
 public class CardRepository {
 
-    private static List<List<Card>> allPacksCard = new ArrayList<>();
+    private static List<LinkedList<Card>> allPacksCard = new ArrayList<>();
+
     static {
-        List<Card> firstPack = new ArrayList<>();
+        LinkedList<Card> firstPack = new LinkedList<>();
         for (int i = 1; i <= 100; i++) {
             firstPack.add(Card.builder()
                             .packId(1)
@@ -26,6 +27,10 @@ public class CardRepository {
 
     public Card getCard(int packId, int cardNumber) {
         return allPacksCard.get(packId).get(cardNumber);
+    }
+
+    public LinkedList<Card> getOnePackCards(int packId) {
+        return allPacksCard.get(packId);
     }
 
 }
