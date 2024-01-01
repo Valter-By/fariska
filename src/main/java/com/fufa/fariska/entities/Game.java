@@ -69,7 +69,7 @@ public class Game {
 
     public int getNextLeader() {
         if (leader < players.size()) {
-            leader +=1;
+            leader += 1;
         } else {
             leader = 1;
         }

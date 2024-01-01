@@ -8,8 +8,9 @@ import java.util.*;
 @Repository
 public class PackRepository {
 
-    public static List<Pack> allPacks = new ArrayList<>();
-    static {
+    private List<Pack> allPacks = new ArrayList<>();
+
+    public void makeFirstPack() {
         allPacks.add(1, Pack.builder()
                         .id(1)
                         .ownerId(1)

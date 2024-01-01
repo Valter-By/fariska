@@ -1,15 +1,13 @@
 package com.fufa.fariska.entities;
 
 import com.fufa.fariska.entities.enums.Avatar;
+import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.repositories.CardRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 
 public class GameTest {
@@ -47,6 +45,7 @@ public class GameTest {
         @Test
         public void shouldTakeOneCardWhenUseFor100pcs() {
             CardRepository cardRepository = new CardRepository();
+            cardRepository.makeFirstPack();
             Game game = Game.builder()
                     .cards(cardRepository.getOnePackCards(0))
                     .build();
@@ -60,6 +59,7 @@ public class GameTest {
         @Test
         public void shouldTakeTwoCardsWhenUseFor100pcs() {
             CardRepository cardRepository = new CardRepository();
+            cardRepository.makeFirstPack();
             Game game = Game.builder()
                     .cards(cardRepository.getOnePackCards(0))
                     .build();
@@ -79,6 +79,7 @@ public class GameTest {
         @Test
         public void shouldTake5CardsWhenUseFor100pcs() {
             CardRepository cardRepository = new CardRepository();
+            cardRepository.makeFirstPack();
             Game game = Game.builder()
                     .cards(cardRepository.getOnePackCards(0))
                     .build();
@@ -88,8 +89,6 @@ public class GameTest {
             Assertions.assertEquals(95, game.getCards().size());
             Assertions.assertEquals(5, cards.size());
             Assertions.assertFalse(game.getCards().contains(cards.get(2)));
-//            Collections.shuffle(cards);
-//            System.out.println(cards);
         }
     }
 
@@ -99,6 +98,7 @@ public class GameTest {
         @Test
         public void shouldDealFor6WhenUseFor100pcsCardsAnd4Players() {
             CardRepository cardRepository = new CardRepository();
+            cardRepository.makeFirstPack();
 
             Game game = Game.builder()
                     .freeAvatars(Avatar.getAll())
@@ -120,9 +120,148 @@ public class GameTest {
             for (int i = 0; i < 4; i++) {
                 Assertions.assertEquals(6, players.get(i).getHandCards().size());
             }
+            Assertions.assertEquals(76, game.getCards().size());
+        }
+    }
 
+    @Nested
+    public class AddAllPoints {
 
+        @Test
+        public void shouldAddAllPointsWhenUseFor4PlayersWithoutPoints() {
 
+            Game game = Game.builder()
+                    .freeAvatars(Avatar.getAll())
+                    .build();
+
+            ArrayList<Player> players = new ArrayList<>();
+
+            for (int i = 0; i < 4; i++) {
+                players.add(Player.builder()
+                        .avatar(game.getFreeAvatar())
+                        .build());
+            }
+            game.setPlayers(players);
+
+            int[] points = new int[]{0, 1, 2, 3, 4};
+
+            game.addAllPoints(points);
+
+            for (int i = 0; i < 4; i++) {
+                Assertions.assertEquals(i + 1, players.get(i).getPoints());
+            }
+        }
+
+        @Test
+        public void shouldAddAllPointsWhenUseFor4PlayersWithPoints() {
+
+            Game game = Game.builder()
+                    .freeAvatars(Avatar.getAll())
+                    .build();
+
+            ArrayList<Player> players = new ArrayList<>();
+
+            for (int i = 0; i < 4; i++) {
+                players.add(Player.builder()
+                        .points(4 - i)
+                        .avatar(game.getFreeAvatar())
+                        .build());
+            }
+            game.setPlayers(players);
+
+            int[] points = new int[]{0, 1, 2, 3, 4};
+
+            game.addAllPoints(points);
+
+            for (int i = 0; i < 4; i++) {
+                Assertions.assertEquals(5, players.get(i).getPoints());
+            }
+        }
+    }
+
+    @Nested
+    public class GetNextLeader {
+
+        @Test
+        public void shouldGetNextLeaderWhenUseForFirstLeaderPlayer() {
+
+            Game game = Game.builder()
+                    .leader(1)
+                    .freeAvatars(Avatar.getAll())
+                    .build();
+
+            ArrayList<Player> players = new ArrayList<>();
+
+            for (int i = 0; i < 4; i++) {
+                players.add(Player.builder()
+                        .avatar(game.getFreeAvatar())
+                        .build());
+            }
+
+            game.setPlayers(players);
+
+            Assertions.assertEquals(2, game.getNextLeader());
+            Assertions.assertEquals(2, game.getLeader());
+        }
+
+        @Test
+        public void shouldGetNextLeaderWhenUseForMiddleLeaderPlayer() {
+
+            Game game = Game.builder()
+                    .leader(3)
+                    .freeAvatars(Avatar.getAll())
+                    .build();
+
+            ArrayList<Player> players = new ArrayList<>();
+
+            for (int i = 0; i < 4; i++) {
+                players.add(Player.builder()
+                        .avatar(game.getFreeAvatar())
+                        .build());
+            }
+
+            game.setPlayers(players);
+
+            Assertions.assertEquals(4, game.getNextLeader());
+            Assertions.assertEquals(4, game.getLeader());
+        }
+
+        @Test
+        public void shouldGetNextLeaderWhenUseForLastLeaderPlayer() {
+
+            Game game = Game.builder()
+                    .leader(4)
+                    .freeAvatars(Avatar.getAll())
+                    .build();
+
+            ArrayList<Player> players = new ArrayList<>();
+
+            for (int i = 0; i < 4; i++) {
+                players.add(Player.builder()
+                        .avatar(game.getFreeAvatar())
+                        .build());
+            }
+
+            game.setPlayers(players);
+
+            Assertions.assertEquals(1, game.getNextLeader());
+            Assertions.assertEquals(1, game.getLeader());
+        }
+    }
+
+    @Nested
+    public class Finish {
+
+        @Test
+        public void shouldFinishGameWhenUseForGameOverGame() {
+
+            Game game = Game.builder()
+                    .status(GameStatus.PLAYING)
+                    .build();
+
+            game.finish();
+
+            Assertions.assertEquals(GameStatus.GAME_OVER, game.getStatus());
         }
     }
 }

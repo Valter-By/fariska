@@ -10,9 +10,9 @@ import java.util.*;
 @Repository
 public class CardRepository {
 
-    private static List<LinkedList<Card>> allPacksCard = new ArrayList<>();
+    private  List<LinkedList<Card>> allPacksCard = new ArrayList<>(); //may be make Map
 
-    static {
+    public void makeFirstPack() {                   //may be make method for any standard Pack
         LinkedList<Card> firstPack = new LinkedList<>();
         for (int i = 1; i <= 100; i++) {
             firstPack.add(Card.builder()

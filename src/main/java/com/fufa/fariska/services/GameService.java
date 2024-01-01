@@ -23,6 +23,7 @@ public class GameService {
     private Map<Integer, Game> createdGames;
 
     public synchronized Game makeNewGame(GameRequestDto gameRequestDto, User user) {
+
         int gameId = ++totalGames;
 
         Set<Integer> packsId = gameRequestDto.getPacksId();
@@ -231,7 +232,15 @@ public class GameService {
         return game;
     }
 
+    public synchronized Game deleteGame(User user, int gameId) {
 
+        Game game = createdGames.remove(gameId);                    //may be required game obj to remove
+        if (user.getId() != game.getCreator().getId()) {
+            return null;                                     // make exception
+        }
+
+        return game;
+    }
 
     private synchronized LinkedList<Card> collectAllCardsAndShuffle(Set<Pack> packs) {
 

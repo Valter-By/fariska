@@ -14,7 +14,7 @@ public class Player {
     private int place;
     private Avatar avatar;
     private List<Card> handCards;
-    private boolean isLeader;
+    private boolean isLeader;   //may be not required + did not work correctly
     private int points;
 
     public Card putOneCard(int number) {
