@@ -14,7 +14,7 @@ import java.util.Set;
 @SuperBuilder
 @Data
 public class Game {
-    private long id;
+    private int id;
     private Instant create_time;
     private User creator;
     private GameStatus status;

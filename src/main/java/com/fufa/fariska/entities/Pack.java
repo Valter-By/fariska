@@ -3,6 +3,7 @@ package com.fufa.fariska.entities;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
 import java.util.Set;
 
 @SuperBuilder
@@ -10,6 +11,6 @@ import java.util.Set;
 public class Pack {
     private int id;
     private int ownerId;
-    private Set<Card> cards;
+    private List<Card> cards;
     private String name;
 }

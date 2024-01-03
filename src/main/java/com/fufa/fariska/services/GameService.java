@@ -10,12 +10,14 @@ import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
 import com.fufa.fariska.repositories.GameRepository;
 import com.fufa.fariska.repositories.PackRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 
 @Service
+@AllArgsConstructor
 public class GameService {
     public GameRepository gameRepository;
     public PackRepository packRepository;
@@ -27,7 +29,7 @@ public class GameService {
         int gameId = ++totalGames;
 
         Set<Integer> packsId = gameRequestDto.getPacksId();
-        Set<Pack> packs = packRepository.getPacks(packsId);
+        List<Pack> packs = packRepository.getPacks(packsId);
         LinkedList<Card> cards = collectAllCardsAndShuffle(packs);
 
         Game game = Game.builder()
@@ -242,7 +244,7 @@ public class GameService {
         return game;
     }
 
-    private synchronized LinkedList<Card> collectAllCardsAndShuffle(Set<Pack> packs) {
+    private synchronized LinkedList<Card> collectAllCardsAndShuffle(List<Pack> packs) {
 
         LinkedList<Card> cards = new LinkedList<>();
         for (Pack pack : packs) {

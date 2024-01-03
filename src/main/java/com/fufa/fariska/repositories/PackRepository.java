@@ -1,11 +1,15 @@
 package com.fufa.fariska.repositories;
 
 import com.fufa.fariska.entities.Pack;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
+@AllArgsConstructor
 public class PackRepository {
 
     private List<Pack> allPacks = new ArrayList<>();
@@ -14,13 +18,13 @@ public class PackRepository {
         allPacks.add(1, Pack.builder()
                         .id(1)
                         .ownerId(1)
-                        .cards(new LinkedHashSet<>()) //make fnc to generate int 1...100 or take from CardRepository
+                        .cards(new ArrayList<>()) //make fnc to generate int 1...100 or take from CardRepository
                         .name("First")
                 .build());
     }
 
-    public Set<Pack> getPacks(Set<Integer> packsId) {
-        Set<Pack> ans = new HashSet<>();
+    public List<Pack> getPacks(Set<Integer> packsId) {
+        List<Pack> ans = new ArrayList<>();
         for (Integer i : packsId) {
             ans.add(allPacks.get(i));
         }

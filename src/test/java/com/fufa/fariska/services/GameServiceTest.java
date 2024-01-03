@@ -3,8 +3,11 @@ package com.fufa.fariska.services;
 
 import com.fufa.fariska.dto.GameRequestDto;
 import com.fufa.fariska.entities.Card;
+import com.fufa.fariska.entities.Game;
 import com.fufa.fariska.entities.Pack;
 import com.fufa.fariska.entities.User;
+import com.fufa.fariska.entities.enums.Avatar;
+import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.repositories.CardRepository;
 import com.fufa.fariska.repositories.PackRepository;
 import org.junit.jupiter.api.Assertions;
@@ -14,9 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class GameServiceTest {
@@ -28,19 +29,23 @@ public class GameServiceTest {
     public CardRepository cardRepository;
 
 //    @Mock
-//    public PackRepository packRepository;
+    PackRepository packRepository;
+
 
     //    static GameService gameService;
     static GameRequestDto gameRequestDto;
     static Set<Integer> packsId;
-    static Set<Pack> packs;
+    static List<Pack> packs;
+
+    static List<Card> cards1;
+    static List<Card> cards2;
     static User user;
 
     @BeforeEach
     public void makeData() {
 
-        Set<Card> cards1 = new HashSet<>();
-        Set<Card> cards2 = new HashSet<>();
+        cards1 = new ArrayList<>();
+        cards2 = new ArrayList<>();
 
         for (int i = 0; i < 50; i++) {
             cards1.add(Card.builder()
@@ -56,7 +61,7 @@ public class GameServiceTest {
 //        cardRepository = new CardRepository();
 //        cardRepository.makeFirstPack();
 
-        Set<Integer> packsId = new HashSet<>(List.of(1, 2));
+        packsId = new HashSet<>(List.of(1, 2));
         gameRequestDto = GameRequestDto.builder()
                 .packsId(packsId)
                 .build();
@@ -64,15 +69,21 @@ public class GameServiceTest {
                 .name("Fufa")
                 .id(1)
                 .build();
-        packs = new HashSet<>();
-        packs.add(Pack.builder()
+        packs = new ArrayList<>();
+        packs.add(null);
+        packs.add(1, Pack.builder()
                 .id(1)
                 .cards(cards1)
                 .build());
-        packs.add(Pack.builder()
+        packs.add(2, Pack.builder()
                 .id(2)
                 .cards(cards2)
                 .build());
+
+        packRepository = new PackRepository(packs);
+//        packRepository = Mockito.mock(PackRepository.class);
+//        Mockito.when(packRepository.getPacks(packsId)).thenReturn(packs);
+        gameService = new GameService(null, packRepository, new HashMap<>());
     }
 
 
@@ -82,16 +93,73 @@ public class GameServiceTest {
         @Test
         public void shouldMakeNewGameWhenAllIsGood() {
 
-            int a = 1;
+            Game game = gameService.makeNewGame(gameRequestDto, user);
 
-
-            PackRepository packRepository = Mockito.mock(PackRepository.class);
-            Mockito.when(packRepository.getPacks(packsId)).thenReturn(packs);
-            System.out.println(packRepository.getPacks(packsId));
-
-            Assertions.assertEquals(1, a);
+            Assertions.assertEquals(gameService.findAllCreatedGames().get(1), game);
+            Assertions.assertEquals(1, gameService.findAllCreatedGames().size());
+            Assertions.assertEquals(1, game.getId());
+            Assertions.assertEquals(user, game.getCreator());
+            Assertions.assertEquals(GameStatus.WAITING_FOR_PLAYERS, game.getStatus());
+            Assertions.assertEquals(user, game.getPlayers().get(0).getUser());
+            Assertions.assertEquals(packsId, game.getPacksId());
+            Assertions.assertEquals(cards1.size() + cards2.size(), game.getCards().size());
+            Assertions.assertTrue(game.getCards().containsAll(cards1));
+            Assertions.assertTrue(game.getCards().containsAll(cards2));
+            Assertions.assertFalse(game.getFreeAvatars().contains(game.getPlayers().get(0).getAvatar()));
+            Assertions.assertEquals(Avatar.values().length - 1, game.getFreeAvatars().size());
+            System.out.println();
         }
     }
+
+    @Nested
+    public class FindGameTest {
+
+        @Test
+        public void shouldFindTwoGamesWhenCreatedTwoOnce() {
+
+            GameRequestDto gameRequestDto2 = GameRequestDto.builder()
+                    .packsId(new HashSet<>(List.of(2)))
+                    .build();
+            User user2 = User.builder()
+                    .name("Fariska")
+                    .id(2)
+                    .build();
+            Game game1 = gameService.makeNewGame(gameRequestDto, user);
+            Game game2 = gameService.makeNewGame(gameRequestDto2, user2);
+
+            Assertions.assertEquals(gameService.findGame(1), game1);
+            Assertions.assertEquals(gameService.findGame(2), game2);
+        }
+    }
+
+    @Nested
+    public class FindAllCreatedGamesTest {
+
+        @Test
+        public void shouldFindAllGamesWhenCreatedThreeOnce() {
+
+            GameRequestDto gameRequestDto2 = GameRequestDto.builder()
+                    .packsId(new HashSet<>(List.of(2)))
+                    .build();
+            GameRequestDto gameRequestDto3 = GameRequestDto.builder()
+                    .packsId(new HashSet<>(List.of(1)))
+                    .build();
+            User user2 = User.builder()
+                    .name("Fariska")
+                    .id(2)
+                    .build();
+            Game game1 = gameService.makeNewGame(gameRequestDto, user);
+            Game game2 = gameService.makeNewGame(gameRequestDto2, user2);
+            Game game3 = gameService.makeNewGame(gameRequestDto3, user);
+            HashMap<Integer, Game> expected = new HashMap<>();
+            expected.put(3, game3);
+            expected.put(1, game1);
+            expected.put(2, game2);
+
+            Assertions.assertEquals(expected, gameService.findAllCreatedGames());
+        }
+    }
+
 }
 
 
