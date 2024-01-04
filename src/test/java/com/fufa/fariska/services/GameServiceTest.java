@@ -2,12 +2,10 @@ package com.fufa.fariska.services;
 
 
 import com.fufa.fariska.dto.GameRequestDto;
-import com.fufa.fariska.entities.Card;
-import com.fufa.fariska.entities.Game;
-import com.fufa.fariska.entities.Pack;
-import com.fufa.fariska.entities.User;
+import com.fufa.fariska.entities.*;
 import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
+import com.fufa.fariska.entities.enums.RoundStatus;
 import com.fufa.fariska.repositories.CardRepository;
 import com.fufa.fariska.repositories.PackRepository;
 import org.junit.jupiter.api.Assertions;
@@ -25,14 +23,12 @@ public class GameServiceTest {
     //    @Mock
     public GameService gameService;
 
-    @Mock
-    public CardRepository cardRepository;
+//    @Mock
+//    public CardRepository cardRepository;
 
 //    @Mock
     PackRepository packRepository;
 
-
-    //    static GameService gameService;
     static GameRequestDto gameRequestDto;
     static Set<Integer> packsId;
     static List<Pack> packs;
@@ -43,6 +39,7 @@ public class GameServiceTest {
 
     @BeforeEach
     public void makeData() {
+        System.out.println("BeforeEach makeData() method called");
 
         cards1 = new ArrayList<>();
         cards2 = new ArrayList<>();
@@ -86,7 +83,6 @@ public class GameServiceTest {
         gameService = new GameService(null, packRepository, new HashMap<>());
     }
 
-
     @Nested
     public class MakeNewGameTest {
 
@@ -102,7 +98,7 @@ public class GameServiceTest {
             Assertions.assertEquals(GameStatus.WAITING_FOR_PLAYERS, game.getStatus());
             Assertions.assertEquals(user, game.getPlayers().get(0).getUser());
             Assertions.assertEquals(packsId, game.getPacksId());
-            Assertions.assertEquals(cards1.size() + cards2.size(), game.getCards().size());
+            Assertions.assertEquals(100, game.getCards().size());
             Assertions.assertTrue(game.getCards().containsAll(cards1));
             Assertions.assertTrue(game.getCards().containsAll(cards2));
             Assertions.assertFalse(game.getFreeAvatars().contains(game.getPlayers().get(0).getAvatar()));
@@ -160,32 +156,105 @@ public class GameServiceTest {
         }
     }
 
+    @Nested
+    public class JoinNewPlayerTest {
+
+        @Test
+        public void shouldJoinNewPlayerWhenHaveGame() {
+
+            GameRequestDto gameRequestDto2 = GameRequestDto.builder()
+                    .packsId(new HashSet<>(List.of(2)))
+                    .build();
+            User user2 = User.builder()
+                    .name("Fariska")
+                    .id(2)
+                    .build();
+            User newUser = User.builder()
+                    .name("New")
+                    .id(3)
+                    .build();
+            Game game1 = gameService.makeNewGame(gameRequestDto, user);
+            Game game2 = gameService.makeNewGame(gameRequestDto2, user2);
+
+            gameService.joinNewPlayer(newUser, 1);
+
+            List<Player> players1 = game1.getPlayers();
+            List<Player> players2 = game2.getPlayers();
+
+            Assertions.assertEquals(2, players1.size());
+            Assertions.assertEquals(1, players2.size());
+            Assertions.assertEquals(newUser, players1.get(1).getUser());
+            Assertions.assertEquals(1, players1.get(1).getGameId());
+            Assertions.assertFalse(game1.getFreeAvatars().contains(game1.getPlayers().get(1).getAvatar()));
+            Assertions.assertEquals(Avatar.values().length - 2, game1.getFreeAvatars().size());
+        }
+    }
+
+    @Nested
+    public class StartGameTest {
+
+        @Test
+        public void shouldStartOneGameWhenHaveTwoPlayers() {
+
+            GameRequestDto gameRequestDto2 = GameRequestDto.builder()
+                    .packsId(new HashSet<>(List.of(2)))
+                    .build();
+            User user2 = User.builder()
+                    .name("Fariska")
+                    .id(2)
+                    .build();
+            User newUser = User.builder()
+                    .name("New")
+                    .id(3)
+                    .build();
+            Game game1 = gameService.makeNewGame(gameRequestDto, user);
+            Game game2 = gameService.makeNewGame(gameRequestDto2, user2);
+            gameService.joinNewPlayer(newUser, 1);
+
+            gameService.startGame(user, 1);
+
+            Player player1 = game1.getPlayers().get(0);
+            Player player2 = game1.getPlayers().get(1);
+            Round round = game1.getCurrentRound();
+
+            Assertions.assertEquals(2, gameService.findAllCreatedGames().size());
+            Assertions.assertEquals(1, game1.getId());
+            Assertions.assertEquals(GameStatus.PLAYING, game1.getStatus());
+            Assertions.assertEquals(2, game1.getPlayers().size());
+            Assertions.assertEquals(1, game1.getLeader());
+            Assertions.assertEquals(88, game1.getCards().size());
+            Assertions.assertEquals(Avatar.values().length - 2, game1.getFreeAvatars().size());
+            Assertions.assertEquals(6, player1.getHandCards().size());
+            Assertions.assertEquals(6, player2.getHandCards().size());
+            Assertions.assertEquals(1, round.getNumber());
+            Assertions.assertEquals(player1, round.getLeader());
+            Assertions.assertEquals(3, round.getTableCards().size());
+            Assertions.assertEquals(RoundStatus.WRITING_SECRET, round.getStatus());
+
+            Assertions.assertEquals(GameStatus.WAITING_FOR_PLAYERS, game2.getStatus());
+            Assertions.assertEquals(1, game2.getPlayers().size());
+        }
+
+        @Test
+        public void shouldDoesNotStartOneGameWhenHaveOnePlayer() {
+
+            Game game = gameService.makeNewGame(gameRequestDto, user);
+
+            gameService.startGame(user, 1);
+
+            List<Player> players = game.getPlayers();
+
+            Round round = game.getCurrentRound();
+
+            Assertions.assertEquals(1, gameService.findAllCreatedGames().size());
+            Assertions.assertEquals(1, game.getId());
+            Assertions.assertEquals(GameStatus.WAITING_FOR_PLAYERS, game.getStatus());
+            Assertions.assertEquals(1, game.getPlayers().size());
+            Assertions.assertEquals(0, game.getLeader());
+            Assertions.assertEquals(100, game.getCards().size());
+            Assertions.assertEquals(Avatar.values().length - 1, game.getFreeAvatars().size());
+            Assertions.assertNull(players.get(0).getHandCards());
+            Assertions.assertNull(round);
+        }
+    }
 }
-
-
-//    public static void main(String[] args) {
-//
-//        List<Card> cards = new ArrayList<>(9);
-//        cards.add(0, Card.builder().name("Test").build());
-//
-//        System.out.println(new Move[9]);
-//    }
-
-
-//            PackRepository packRepository = Mockito.mock(PackRepository.class);
-//            Mockito.when(packRepository.getPacks(packsId)).thenReturn(packs);
-//            Game game = gameService.makeNewGame(gameRequestDto, user);
-////            Game expectedGame = Game.builder()
-////                    .id(1)
-////                    .create_time(Instant.now())
-////                    .creator(user)
-////                    .status(GameStatus.WAITING_FOR_PLAYERS)
-////                    .packsId(packsId)
-////                    .cards(cards)
-////                    .build();
-//            Assertions.assertEquals(1, game.getPlayers().size());
-//            Assertions.assertEquals(100, game.getCards().size());
-////            Assertions.assertEquals(, game.getCards());
-//            Assertions.assertEquals(GameStatus.WAITING_FOR_PLAYERS, game.getStatus());
-//            Assertions.assertEquals(new HashSet<>(List.of(1, 2)), game.getPacksId());
-//            Assertions.assertEquals(user, game.getCreator());

@@ -84,20 +84,21 @@ public class GameService {
     public synchronized Game startGame(User user, int gameId) {
 
         Game game = createdGames.get(gameId);
-        if (user.getId() != game.getCreator().getId() || game.getPlayers().size() < 2 || game.getStatus() != GameStatus.WAITING_FOR_PLAYERS) {
-            return null;                                     // make exception
+        if (user.getId() != game.getCreator().getId()
+                || game.getPlayers().size() < 2 || game.getStatus() != GameStatus.WAITING_FOR_PLAYERS) {
+            return game;                                     // make exception
         }
 
         List<Player> players = game.getPlayers();
         putPlayersOnTheirPlaces(players);
         game.setLeader(1);
-        game.dealCards(); //can deal for each when create
+        game.dealCards(); //or can deal for each when create
 
         Round round = Round.builder()
                 .gameId(gameId)
                 .number(1)
                 .leader(players.get(0))
-                .tableCards(List.of(new Move[players.size() + 1]))
+                .tableCards(Move.makeEmptyTableCards(players.size() + 1))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
         game.setCurrentRound(round);
