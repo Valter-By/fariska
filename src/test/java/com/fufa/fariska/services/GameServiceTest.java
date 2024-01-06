@@ -2,16 +2,15 @@ package com.fufa.fariska.services;
 
 
 import com.fufa.fariska.dto.GameRequestDto;
+import com.fufa.fariska.dto.MoveRequestDto;
+import com.fufa.fariska.dto.SecretRequestDto;
 import com.fufa.fariska.entities.*;
 import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
 import com.fufa.fariska.repositories.CardRepository;
 import com.fufa.fariska.repositories.PackRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -20,30 +19,28 @@ import java.util.*;
 
 public class GameServiceTest {
 
-    //    @Mock
-    public GameService gameService;
+    GameService gameService;
 
 //    @Mock
 //    public CardRepository cardRepository;
 
-//    @Mock
+    //    @Mock
     PackRepository packRepository;
 
-    static GameRequestDto gameRequestDto;
-    static Set<Integer> packsId;
-    static List<Pack> packs;
+    GameRequestDto gameRequestDto;
+    Set<Integer> packsId;
+    List<Pack> packs;
 
-    static List<Card> cards1;
-    static List<Card> cards2;
-    static User user;
+    List<Card> cards1;
+    List<Card> cards2;
+    User user;
 
     @BeforeEach
-    public void makeData() {
+    public synchronized void makeData() {
         System.out.println("BeforeEach makeData() method called");
 
         cards1 = new ArrayList<>();
         cards2 = new ArrayList<>();
-
         for (int i = 0; i < 50; i++) {
             cards1.add(Card.builder()
                     .packId(1)
@@ -54,10 +51,6 @@ public class GameServiceTest {
                     .name("two-" + i)
                     .build());
         }
-
-//        cardRepository = new CardRepository();
-//        cardRepository.makeFirstPack();
-
         packsId = new HashSet<>(List.of(1, 2));
         gameRequestDto = GameRequestDto.builder()
                 .packsId(packsId)
@@ -77,21 +70,21 @@ public class GameServiceTest {
                 .cards(cards2)
                 .build());
 
-        packRepository = new PackRepository(packs);
 //        packRepository = Mockito.mock(PackRepository.class);
 //        Mockito.when(packRepository.getPacks(packsId)).thenReturn(packs);
-        gameService = new GameService(null, packRepository, new HashMap<>());
+        packRepository = new PackRepository(packs);
+        gameService = new GameService(null, packRepository, 0, new HashMap<>());
     }
 
     @Nested
     public class MakeNewGameTest {
 
         @Test
-        public void shouldMakeNewGameWhenAllIsGood() {
+        public synchronized void shouldMakeNewGameWhenAllIsGood() {
 
             Game game = gameService.makeNewGame(gameRequestDto, user);
 
-            Assertions.assertEquals(gameService.findAllCreatedGames().get(1), game);
+            Assertions.assertEquals(game, gameService.findAllCreatedGames().get(1));
             Assertions.assertEquals(1, gameService.findAllCreatedGames().size());
             Assertions.assertEquals(1, game.getId());
             Assertions.assertEquals(user, game.getCreator());
@@ -111,7 +104,7 @@ public class GameServiceTest {
     public class FindGameTest {
 
         @Test
-        public void shouldFindTwoGamesWhenCreatedTwoOnce() {
+        public synchronized void shouldFindTwoGamesWhenCreatedTwoOnce() {
 
             GameRequestDto gameRequestDto2 = GameRequestDto.builder()
                     .packsId(new HashSet<>(List.of(2)))
@@ -132,7 +125,7 @@ public class GameServiceTest {
     public class FindAllCreatedGamesTest {
 
         @Test
-        public void shouldFindAllGamesWhenCreatedThreeOnce() {
+        public synchronized void shouldFindAllGamesWhenCreatedThreeOnce() {
 
             GameRequestDto gameRequestDto2 = GameRequestDto.builder()
                     .packsId(new HashSet<>(List.of(2)))
@@ -160,7 +153,7 @@ public class GameServiceTest {
     public class JoinNewPlayerTest {
 
         @Test
-        public void shouldJoinNewPlayerWhenHaveGame() {
+        public synchronized void shouldJoinNewPlayerWhenHaveGame() {
 
             GameRequestDto gameRequestDto2 = GameRequestDto.builder()
                     .packsId(new HashSet<>(List.of(2)))
@@ -194,7 +187,7 @@ public class GameServiceTest {
     public class StartGameTest {
 
         @Test
-        public void shouldStartOneGameWhenHaveTwoPlayers() {
+        public synchronized void shouldStartOneGameWhenHaveTwoPlayers() {
 
             GameRequestDto gameRequestDto2 = GameRequestDto.builder()
                     .packsId(new HashSet<>(List.of(2)))
@@ -236,14 +229,13 @@ public class GameServiceTest {
         }
 
         @Test
-        public void shouldDoesNotStartOneGameWhenHaveOnePlayer() {
+        public synchronized void shouldDoesNotStartOneGameWhenHaveOnePlayer() {
 
             Game game = gameService.makeNewGame(gameRequestDto, user);
 
             gameService.startGame(user, 1);
 
             List<Player> players = game.getPlayers();
-
             Round round = game.getCurrentRound();
 
             Assertions.assertEquals(1, gameService.findAllCreatedGames().size());
@@ -256,5 +248,110 @@ public class GameServiceTest {
             Assertions.assertNull(players.get(0).getHandCards());
             Assertions.assertNull(round);
         }
+    }
+
+    @Nested
+    public class MakeSecretTest {
+
+        @Test
+        public synchronized void shouldMakeSecretWhenHaveThreePlayers() {
+
+            User user2 = User.builder()
+                    .name("Fariska")
+                    .id(2)
+                    .build();
+            User user3 = User.builder()
+                    .name("Fedor")
+                    .id(3)
+                    .build();
+
+            SecretRequestDto secretRequestDto = SecretRequestDto.builder()
+                    .secret("Fucking secret!")
+                    .round(1)
+                    .cardHandNumber(3)
+                    .build();
+
+            Game game = gameService.makeNewGame(gameRequestDto, user);
+            gameService.joinNewPlayer(user2, 1);
+            gameService.joinNewPlayer(user3, 1);
+            gameService.startGame(user, 1);
+
+            Player leader = game.getPlayers().get(0);
+            Player player1 = game.getPlayers().get(1);
+            Player player2 = game.getPlayers().get(2);
+            List<Card> leaderCards = leader.getHandCards();
+            Card expectedSecretCard = leaderCards.get(3);
+            Round round = game.getCurrentRound();
+            gameService.makeSecret(user, 1, secretRequestDto);
+
+            Assertions.assertEquals(GameStatus.PLAYING, game.getStatus());
+            Assertions.assertEquals(3, game.getPlayers().size());
+            Assertions.assertEquals(1, game.getLeader());
+            Assertions.assertEquals(81, game.getCards().size());
+            Assertions.assertEquals(Avatar.values().length - 3, game.getFreeAvatars().size());
+            Assertions.assertEquals(6, leader.getHandCards().size());
+            Assertions.assertEquals(6, player1.getHandCards().size());
+            Assertions.assertEquals(6, player2.getHandCards().size());
+            Assertions.assertEquals(1, round.getNumber());
+            Assertions.assertEquals(leader, round.getLeader());
+            Assertions.assertEquals(secretRequestDto.getSecret(), round.getSecret());
+            Assertions.assertEquals(expectedSecretCard, round.getTableCards().get(1).getCard());
+            Assertions.assertEquals(RoundStatus.MAKING_MOVIES, round.getStatus());
+        }
+
+    }
+
+    @Nested
+    public class MakeMoveTest {
+
+        @Test
+        public synchronized void shouldMakeMoveWhenHaveThreePlayers() {
+
+            User user2 = User.builder()
+                    .name("Fariska")
+                    .id(2)
+                    .build();
+            User user3 = User.builder()
+                    .name("Fedor")
+                    .id(3)
+                    .build();
+
+            SecretRequestDto secretRequestDto = SecretRequestDto.builder()
+                    .secret("Fucking secret!")
+                    .round(1)
+                    .cardHandNumber(3)
+                    .build();
+
+            MoveRequestDto moveRequestDto = MoveRequestDto.builder()
+                    .round(1)
+                    .playerPlace(2)
+                    .cardHandNumber(4)
+                    .build();
+
+            Game game = gameService.makeNewGame(gameRequestDto, user);
+            gameService.joinNewPlayer(user2, 1);
+            gameService.joinNewPlayer(user3, 1);
+            gameService.startGame(user, 1);
+
+            Player leader = game.getPlayers().get(0);
+            Player player1 = game.getPlayers().get(1);
+            Player player2 = game.getPlayers().get(2);
+            List<Card> movingPlayerCards = player1.getHandCards();
+            Card expectedMoveCard = movingPlayerCards.get(4);
+            Round round = game.getCurrentRound();
+            gameService.makeSecret(user, 1, secretRequestDto);
+            gameService.makeMove(player1.getUser(), 1, moveRequestDto);
+
+            Assertions.assertEquals(GameStatus.PLAYING, game.getStatus());
+//            Assertions.assertEquals(80, game.getCards().size());
+            Assertions.assertEquals(6, leader.getHandCards().size());
+            Assertions.assertEquals(6, player1.getHandCards().size());
+            Assertions.assertEquals(6, player2.getHandCards().size());
+            Assertions.assertEquals(1, round.getNumber());
+            Assertions.assertEquals(expectedMoveCard, round.getTableCards().get(2).getCard());
+            Assertions.assertEquals(2, round.getTableCards().get(2).getPlayerPlace());
+            Assertions.assertEquals(RoundStatus.MAKING_MOVIES, round.getStatus());
+        }
+
     }
 }

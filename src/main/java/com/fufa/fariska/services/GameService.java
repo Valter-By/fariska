@@ -21,7 +21,7 @@ import java.util.*;
 public class GameService {
     public GameRepository gameRepository;
     public PackRepository packRepository;
-    private static int totalGames;
+    private int totalGames;
     private Map<Integer, Game> createdGames;
 
     public synchronized Game makeNewGame(GameRequestDto gameRequestDto, User user) {
@@ -129,7 +129,7 @@ public class GameService {
 
         round.setSecret(secretRequestDto.getSecret());
 
-        leader.getHandCards().add(game.takeSomeCards(1).get(0)); // make method to take one card
+        leader.getHandCards().add(game.takeOneCard());
 
         round.setStatus(RoundStatus.MAKING_MOVIES);
         return game;
