@@ -76,8 +76,6 @@ public class GameService {
                 .build();
         List<Player> players = game.getPlayers();
         players.add(player);
-        game.setPlayers(players);
-
         return player;
     }
 
@@ -98,7 +96,7 @@ public class GameService {
                 .gameId(gameId)
                 .number(1)
                 .leader(players.get(0))
-                .tableCards(Move.makeEmptyTableCards(players.size() + 1))
+                .tableCards(Move.makeEmptyTableCards(players.size()))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
         game.setCurrentRound(round);
@@ -110,8 +108,11 @@ public class GameService {
 
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
+        Player leader = round.getLeader();
+        int leaderPlace = game.getLeader();
 
-        if (user.getId() != game.getLeader() || round.getNumber() != secretRequestDto.getRound() || game.getStatus() != GameStatus.PLAYING) {
+        if (!Objects.equals(leader.getUser(), user)
+                || round.getNumber() != secretRequestDto.getRound() || game.getStatus() != GameStatus.PLAYING) {
             return null;                                     // make exception
         }
 
@@ -119,8 +120,6 @@ public class GameService {
             return null;                                     // make exception
         }
 
-        Player leader = round.getLeader();
-        int leaderPlace = game.getLeader();
 
         Card leaderCard = leader.getHandCards().remove(secretRequestDto.getCardHandNumber());
         round.setLeaderCard(leaderCard);
@@ -140,9 +139,10 @@ public class GameService {
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
         int place = moveRequestDto.getPlayerPlace();
+        List<Player> players = game.getPlayers();
+        Player player = players.get(place - 1);
 
-
-        if (game.getPlayers().get(place).getUser().getId() != user.getId()) {
+        if (player.getUser().getId() != user.getId()) {
             return null;                                     // make exception
         }
 
@@ -151,17 +151,14 @@ public class GameService {
             return null;                                     // make exception
         }
 
-        if (round.getTableCards().get(place) != null) {
+        if (round.getTableCards().get(place - 1) != null) {
             return null;                                     // make exception
         }
 
-        List<Player> players = game.getPlayers();
-        Player player = players.get(place);
         Card card = player.putOneCard(moveRequestDto.getCardHandNumber());
         round.putCardOnTable(place, card);
 
         player.takeOneCard(game.takeOneCard());
-
 
         if (game.getPlayers().size() <= (round.getNumberMoves())) {
             endMoveAndStartVoting(round);

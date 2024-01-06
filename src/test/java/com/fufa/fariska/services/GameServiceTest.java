@@ -319,13 +319,13 @@ public class GameServiceTest {
             SecretRequestDto secretRequestDto = SecretRequestDto.builder()
                     .secret("Fucking secret!")
                     .round(1)
-                    .cardHandNumber(3)
+                    .cardHandNumber(2)
                     .build();
 
             MoveRequestDto moveRequestDto = MoveRequestDto.builder()
                     .round(1)
                     .playerPlace(2)
-                    .cardHandNumber(4)
+                    .cardHandNumber(3)
                     .build();
 
             Game game = gameService.makeNewGame(gameRequestDto, user);
@@ -333,23 +333,26 @@ public class GameServiceTest {
             gameService.joinNewPlayer(user3, 1);
             gameService.startGame(user, 1);
 
-            Player leader = game.getPlayers().get(0);
-            Player player1 = game.getPlayers().get(1);
-            Player player2 = game.getPlayers().get(2);
+            Player leader = game.getPlayers().get(0);  //place = 1
+            Player player1 = game.getPlayers().get(1); //place = 2
+            Player player2 = game.getPlayers().get(2); //place = 3
+
+            gameService.makeSecret(leader.getUser(), 1, secretRequestDto);
+
             List<Card> movingPlayerCards = player1.getHandCards();
-            Card expectedMoveCard = movingPlayerCards.get(4);
+            Card expectedMoveCard = movingPlayerCards.get(3);
             Round round = game.getCurrentRound();
-            gameService.makeSecret(user, 1, secretRequestDto);
+
             gameService.makeMove(player1.getUser(), 1, moveRequestDto);
 
             Assertions.assertEquals(GameStatus.PLAYING, game.getStatus());
-//            Assertions.assertEquals(80, game.getCards().size());
+            Assertions.assertEquals(80, game.getCards().size());
             Assertions.assertEquals(6, leader.getHandCards().size());
             Assertions.assertEquals(6, player1.getHandCards().size());
             Assertions.assertEquals(6, player2.getHandCards().size());
             Assertions.assertEquals(1, round.getNumber());
-            Assertions.assertEquals(expectedMoveCard, round.getTableCards().get(2).getCard());
-            Assertions.assertEquals(2, round.getTableCards().get(2).getPlayerPlace());
+            Assertions.assertEquals(expectedMoveCard, round.getTableCards().get(1).getCard());
+            Assertions.assertEquals(2, round.getTableCards().get(1).getPlayerPlace());
             Assertions.assertEquals(RoundStatus.MAKING_MOVIES, round.getStatus());
         }
 

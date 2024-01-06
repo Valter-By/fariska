@@ -26,7 +26,7 @@ public class Round {
     private boolean lastRound;
 
     public void putCardOnTable(int place, Card card) {
-        tableCards.add(place, Move.builder()
+        tableCards.add(place - 1, Move.builder()
                 .playerPlace(place)
                 .card(card)
                 .build());

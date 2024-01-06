@@ -18,7 +18,7 @@ public class Move {
     private Card card;
 
     public static List<Move> makeEmptyTableCards(int n) {
-        ArrayList<Move> list = new ArrayList<>(n);
+        ArrayList<Move> list = new ArrayList<>(n + 1);
         for (int i = 0; i < n; i++) {
             list.add(null);
         }

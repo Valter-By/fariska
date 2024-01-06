@@ -54,7 +54,7 @@ public class Game {
 
     public Card takeOneCard() {
         if (cards.isEmpty()) {
-            currentRound.setLastRound(true);
+            currentRound.setLastRound(true); //depends on the playing type
             return null;
         }
         return cards.removeLast();
