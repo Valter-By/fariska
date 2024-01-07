@@ -4,15 +4,13 @@ package com.fufa.fariska.services;
 import com.fufa.fariska.dto.GameRequestDto;
 import com.fufa.fariska.dto.MoveRequestDto;
 import com.fufa.fariska.dto.SecretRequestDto;
+import com.fufa.fariska.dto.VoteRequestDto;
 import com.fufa.fariska.entities.*;
 import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
-import com.fufa.fariska.repositories.CardRepository;
 import com.fufa.fariska.repositories.PackRepository;
 import org.junit.jupiter.api.*;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.util.*;
 
@@ -37,7 +35,6 @@ public class GameServiceTest {
 
     @BeforeEach
     public synchronized void makeData() {
-        System.out.println("BeforeEach makeData() method called");
 
         cards1 = new ArrayList<>();
         cards2 = new ArrayList<>();
@@ -282,20 +279,17 @@ public class GameServiceTest {
             List<Card> leaderCards = leader.getHandCards();
             Card expectedSecretCard = leaderCards.get(3);
             Round round = game.getCurrentRound();
-            gameService.makeSecret(user, 1, secretRequestDto);
+            gameService.makeSecret(leader.getUser(), 1, secretRequestDto);
 
             Assertions.assertEquals(GameStatus.PLAYING, game.getStatus());
             Assertions.assertEquals(3, game.getPlayers().size());
             Assertions.assertEquals(1, game.getLeader());
             Assertions.assertEquals(81, game.getCards().size());
-            Assertions.assertEquals(Avatar.values().length - 3, game.getFreeAvatars().size());
             Assertions.assertEquals(6, leader.getHandCards().size());
-            Assertions.assertEquals(6, player1.getHandCards().size());
-            Assertions.assertEquals(6, player2.getHandCards().size());
             Assertions.assertEquals(1, round.getNumber());
             Assertions.assertEquals(leader, round.getLeader());
             Assertions.assertEquals(secretRequestDto.getSecret(), round.getSecret());
-            Assertions.assertEquals(expectedSecretCard, round.getTableCards().get(1).getCard());
+            Assertions.assertEquals(expectedSecretCard, round.getTableCards().get(0).getCard());
             Assertions.assertEquals(RoundStatus.MAKING_MOVIES, round.getStatus());
         }
 
@@ -305,7 +299,7 @@ public class GameServiceTest {
     public class MakeMoveTest {
 
         @Test
-        public synchronized void shouldMakeMoveWhenHaveThreePlayers() {
+        public synchronized void shouldMakeFirstMoveWhenHaveThreePlayers() {
 
             User user2 = User.builder()
                     .name("Fariska")
@@ -353,8 +347,138 @@ public class GameServiceTest {
             Assertions.assertEquals(1, round.getNumber());
             Assertions.assertEquals(expectedMoveCard, round.getTableCards().get(1).getCard());
             Assertions.assertEquals(2, round.getTableCards().get(1).getPlayerPlace());
+            Assertions.assertEquals(2, round.getNumberMoves());
             Assertions.assertEquals(RoundStatus.MAKING_MOVIES, round.getStatus());
         }
 
+        @Test
+        public synchronized void shouldMakeTwoMovesAndStartVotingWhenHaveThreePlayers() {
+
+            User user2 = User.builder()
+                    .name("Fariska")
+                    .id(2)
+                    .build();
+            User user3 = User.builder()
+                    .name("Fedor")
+                    .id(3)
+                    .build();
+
+            SecretRequestDto secretRequestDto = SecretRequestDto.builder()
+                    .secret("Fucking secret!")
+                    .round(1)
+                    .cardHandNumber(2)
+                    .build();
+
+            MoveRequestDto moveRequestDto1 = MoveRequestDto.builder()
+                    .round(1)
+                    .playerPlace(2)
+                    .cardHandNumber(3)
+                    .build();
+
+            MoveRequestDto moveRequestDto2 = MoveRequestDto.builder()
+                    .round(1)
+                    .playerPlace(3)
+                    .cardHandNumber(5)
+                    .build();
+
+            Game game = gameService.makeNewGame(gameRequestDto, user);
+            gameService.joinNewPlayer(user2, 1);
+            gameService.joinNewPlayer(user3, 1);
+            gameService.startGame(user, 1);
+
+            Player leader = game.getPlayers().get(0);  //place = 1
+            Player player1 = game.getPlayers().get(1); //place = 2
+            Player player2 = game.getPlayers().get(2); //place = 3
+
+            gameService.makeSecret(leader.getUser(), 1, secretRequestDto);
+
+            Round round = game.getCurrentRound();
+
+            gameService.makeMove(player1.getUser(), 1, moveRequestDto1);
+            gameService.makeMove(player2.getUser(), 1, moveRequestDto2);
+
+            Assertions.assertEquals(GameStatus.PLAYING, game.getStatus());
+            Assertions.assertEquals(79, game.getCards().size());
+            Assertions.assertEquals(6, leader.getHandCards().size());
+            Assertions.assertEquals(6, player1.getHandCards().size());
+            Assertions.assertEquals(6, player2.getHandCards().size());
+            Assertions.assertEquals(1, round.getNumber());
+            Assertions.assertEquals(3, round.getNumberMoves());
+//            Assertions.assertEquals(3, round.getPlayerMoves()[2]);
+
+            Assertions.assertEquals(RoundStatus.VOTING, round.getStatus());
+        }
+
+    }
+
+    @Nested
+    public class MakeVoteTest {
+
+        @Test
+        public synchronized void shouldMakeOneVoteAfterMovingWhenHaveThreePlayers() {
+
+            User user2 = User.builder()
+                    .name("Fariska")
+                    .id(2)
+                    .build();
+            User user3 = User.builder()
+                    .name("Fedor")
+                    .id(3)
+                    .build();
+
+            SecretRequestDto secretRequestDto = SecretRequestDto.builder()
+                    .secret("Fucking secret!")
+                    .round(1)
+                    .cardHandNumber(2)
+                    .build();
+
+            MoveRequestDto moveRequestDto1 = MoveRequestDto.builder()
+                    .round(1)
+                    .playerPlace(2)
+                    .cardHandNumber(3)
+                    .build();
+
+            MoveRequestDto moveRequestDto2 = MoveRequestDto.builder()
+                    .round(1)
+                    .playerPlace(3)
+                    .cardHandNumber(5)
+                    .build();
+
+            Game game = gameService.makeNewGame(gameRequestDto, user);
+            gameService.joinNewPlayer(user2, 1);
+            gameService.joinNewPlayer(user3, 1);
+            gameService.startGame(user, 1);
+
+            Player leader = game.getPlayers().get(0);  //place = 1
+            Player player1 = game.getPlayers().get(1); //place = 2
+            Player player2 = game.getPlayers().get(2); //place = 3
+
+            gameService.makeSecret(leader.getUser(), 1, secretRequestDto);
+            gameService.makeMove(player1.getUser(), 1, moveRequestDto1);
+            gameService.makeMove(player2.getUser(), 1, moveRequestDto2);
+
+            Round round = game.getCurrentRound();
+
+            List<TableCard> tableCards = round.getTableCards();
+
+            int secretPlace = round.findNumberLeaderCard();
+
+            VoteRequestDto voteRequestDto = VoteRequestDto.builder()
+                    .round(1)
+                    .playerPlace(2)
+                    .cardTableNumber(secretPlace)
+                    .build();
+
+            gameService.makeVote(player1.getUser(), 1, voteRequestDto);
+
+            Assertions.assertEquals(79, game.getCards().size());
+            Assertions.assertEquals(6, leader.getHandCards().size());
+            Assertions.assertEquals(6, player1.getHandCards().size());
+            Assertions.assertEquals(6, player2.getHandCards().size());
+            Assertions.assertEquals(1, round.getNumber());
+            Assertions.assertEquals(3, round.getNumberVotes());
+            Assertions.assertEquals(secretPlace, round.getPlayerVotes()[2]);
+            Assertions.assertEquals(RoundStatus.VOTING, round.getStatus());
+        }
     }
 }

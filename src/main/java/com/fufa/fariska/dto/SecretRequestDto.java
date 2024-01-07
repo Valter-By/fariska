@@ -12,7 +12,8 @@ import java.util.List;
 @SuperBuilder
 @Data
 public class SecretRequestDto {
-    private String secret;
+
     private int round;
+    private String secret;
     private int cardHandNumber;
 }

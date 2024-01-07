@@ -89,14 +89,14 @@ public class GameService {
 
         List<Player> players = game.getPlayers();
         putPlayersOnTheirPlaces(players);
-        game.setLeader(1);
+        game.setLeader(0);
         game.dealCards(); //or can deal for each when create
 
         Round round = Round.builder()
                 .gameId(gameId)
                 .number(1)
                 .leader(players.get(0))
-                .tableCards(Move.makeEmptyTableCards(players.size()))
+                .tableCards(new ArrayList<>(9))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
         game.setCurrentRound(round);
@@ -120,15 +120,14 @@ public class GameService {
             return null;                                     // make exception
         }
 
-
-        Card leaderCard = leader.getHandCards().remove(secretRequestDto.getCardHandNumber());
+        Card leaderCard = leader.putOneCard(secretRequestDto.getCardHandNumber());
         round.setLeaderCard(leaderCard);
 
-        round.putCardOnTable(leaderPlace, leaderCard);
+        round.putCardOnTable(leaderPlace, leaderCard, true);
 
         round.setSecret(secretRequestDto.getSecret());
 
-        leader.getHandCards().add(game.takeOneCard());
+        leader.takeOneCard(game.takeOneCard());
 
         round.setStatus(RoundStatus.MAKING_MOVIES);
         return game;
@@ -140,7 +139,7 @@ public class GameService {
         Round round = game.getCurrentRound();
         int place = moveRequestDto.getPlayerPlace();
         List<Player> players = game.getPlayers();
-        Player player = players.get(place - 1);
+        Player player = players.get(place);
 
         if (player.getUser().getId() != user.getId()) {
             return null;                                     // make exception
@@ -151,17 +150,17 @@ public class GameService {
             return null;                                     // make exception
         }
 
-        if (round.getTableCards().get(place - 1) != null) {
+        if (round.didPlayerMakeMove(place)) {
             return null;                                     // make exception
         }
 
         Card card = player.putOneCard(moveRequestDto.getCardHandNumber());
-        round.putCardOnTable(place, card);
+        round.putCardOnTable(place, card, false);
 
         player.takeOneCard(game.takeOneCard());
 
         if (game.getPlayers().size() <= (round.getNumberMoves())) {
-            endMoveAndStartVoting(round);
+            round.endMoveAndStartVoting();
         }
         return game;
     }
@@ -185,17 +184,19 @@ public class GameService {
             return null;                                     // make exception
         }
 
-        if (round.getPlayerVotes()[place] != 0) {
+        if (round.didPlayerMakeVote(place)) {
             return null;                                     // make exception
         }
 
-        int vote = voteRequestDto.getCardTableNumber();
+        TableCard voteCard = round.getTableCards().get(voteRequestDto.getCardTableNumber());
 
-        if (round.getPlayerMoves()[place] == vote) {
+        if (voteCard.getPlayerPlace() == place) {
             return null;                                     // make exception
         }
 
-        round.getPlayerVotes()[place] = vote;
+        voteCard.getVotes().add(place);
+
+//        round.getPlayerVotes()[place] = vote;
         round.setNumberVotes(round.getNumberVotes() + 1);
 
         if (game.getPlayers().size() <= round.getNumberVotes() + 1) {
@@ -225,7 +226,7 @@ public class GameService {
                 .gameId(gameId)
                 .number(game.getCurrentRound().getNumber() + 1)
                 .leader(players.get(game.getNextLeader() - 1))
-                .tableCards(List.of(new Move[players.size() + 1]))
+//                .tableCards(List.of(new Move[players.size()]))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
         game.setCurrentRound(round);
@@ -256,26 +257,13 @@ public class GameService {
 
         Collections.shuffle(players);
         players.get(0).setLeader(true);
-        for (int i = 0; i < players.size(); i++) {
-            players.get(i).setPlace(i + 1);
+        int i = 0;
+        for (Player player : players) {
+            player.setPlace(i++);
         }
     }
 
-    private void endMoveAndStartVoting(Round round) {
 
-        Collections.shuffle(round.getTableCards());
-        int[] movies = new int[round.getTableCards().size() + 1];
-        int cardPosition = 1;
-        for (Move move : round.getTableCards()) {
-            movies[move.getPlayerPlace()] = cardPosition++;
-        }
-        round.setPlayerMoves(movies);
-
-        int[] votes = new int[round.getTableCards().size() + 1];
-        round.setPlayerVotes(votes);
-
-        round.setStatus(RoundStatus.VOTING);
-    }
 
     private int[] endVoteAndCalcPoints(Round round) {
 
