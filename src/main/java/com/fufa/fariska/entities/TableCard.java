@@ -13,12 +13,12 @@ import java.util.List;
 public class TableCard {
 
     private int playerPlace;
-    boolean isSecretCard;
-    Card card;
-    List<Integer> votes;
+    private boolean isSecretCard;
+    private Card card;
+    private List<Integer> votes;
 
     public static List<TableCard> makeEmptyTableCards(int n) {
-        ArrayList<TableCard> list = new ArrayList<>(n + 1);
+        ArrayList<TableCard> list = new ArrayList<>(9);
         for (int i = 0; i < n; i++) {
             list.add(null);
         }

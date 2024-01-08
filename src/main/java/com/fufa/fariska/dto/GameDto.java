@@ -14,8 +14,8 @@ import java.util.List;
 public class GameDto {
     private long id;
     private Instant create_time;
-    private User creator;
     private GameStatus status;
     private List<Player> players;
     private int currentRound;
+    private int leader;
 }

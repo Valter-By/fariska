@@ -1,5 +1,7 @@
 package com.fufa.fariska.entities;
 
+import com.fufa.fariska.dto.PlayerDto;
+import com.fufa.fariska.dto.RoundDto;
 import com.fufa.fariska.entities.enums.Avatar;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -14,7 +16,7 @@ public class Player {
     private int place;
     private Avatar avatar;
     private List<Card> handCards;
-    private boolean isLeader;   //may be not required + did not work correctly
+    private boolean isLeader;
     private int points;
 
     public Card putOneCard(int number) {
@@ -27,5 +29,15 @@ public class Player {
 
     public void addPoints(int somePoints) {
         points += somePoints;
+    }
+
+    public PlayerDto makeDto() {
+        return PlayerDto.builder()
+                .gameId(gameId)
+                .place(place)
+                .avatar(avatar)
+                .handCards(handCards)
+                .points(points)
+                .build();
     }
 }

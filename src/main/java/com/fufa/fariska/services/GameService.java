@@ -1,30 +1,34 @@
 package com.fufa.fariska.services;
 
-import com.fufa.fariska.dto.GameRequestDto;
-import com.fufa.fariska.dto.MoveRequestDto;
-import com.fufa.fariska.dto.SecretRequestDto;
-import com.fufa.fariska.dto.VoteRequestDto;
+import com.fufa.fariska.dto.*;
 import com.fufa.fariska.entities.*;
 import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
-import com.fufa.fariska.repositories.GameRepository;
 import com.fufa.fariska.repositories.PackRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 
 @Service
-@AllArgsConstructor
+//@AllArgsConstructor
 public class GameService {
-    public GameRepository gameRepository;
-    public PackRepository packRepository;
-    private int totalGames;
-    private Map<Integer, Game> createdGames;
 
-    public synchronized Game makeNewGame(GameRequestDto gameRequestDto, User user) {
+    public PackRepository packRepository;
+    @Value("0")
+    private Integer totalGames;
+    public Map<Integer, Game> createdGames;
+
+    @Autowired
+    public void setTotalGames() {
+        totalGames = 0;
+    }
+
+    public synchronized Game makeNewGame(User user, GameRequestDto gameRequestDto) {
 
         int gameId = ++totalGames;
 
@@ -34,7 +38,7 @@ public class GameService {
 
         Game game = Game.builder()
                 .id(gameId)
-                .create_time(Instant.now())
+                .createTime(Instant.now())
                 .creator(user)
                 .status(GameStatus.WAITING_FOR_PLAYERS)
                 .packsId(packsId)
@@ -96,7 +100,7 @@ public class GameService {
                 .gameId(gameId)
                 .number(1)
                 .leader(players.get(0))
-                .tableCards(new ArrayList<>(9))
+                .tableCards(TableCard.makeEmptyTableCards(players.size()))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
         game.setCurrentRound(round);
@@ -196,11 +200,10 @@ public class GameService {
 
         voteCard.getVotes().add(place);
 
-//        round.getPlayerVotes()[place] = vote;
         round.setNumberVotes(round.getNumberVotes() + 1);
 
         if (game.getPlayers().size() <= round.getNumberVotes() + 1) {
-            game.addAllPoints(endVoteAndCalcPoints(round));
+            game.addAllPoints(round.endVoteAndCalcPoints());
             round.setStatus(RoundStatus.WAITING_FOR_NEXT_ROUND);
         }
 
@@ -210,9 +213,10 @@ public class GameService {
     public synchronized Game startNextRound(User user, int gameId) {
 
         Game game = createdGames.get(gameId);
+        Round round = game.getCurrentRound();
 
         if (game.getStatus() != GameStatus.PLAYING
-                || game.getCurrentRound().getStatus() != RoundStatus.WAITING_FOR_NEXT_ROUND) {
+                || round.getStatus() != RoundStatus.WAITING_FOR_NEXT_ROUND) {
             return null;                                     // make exception
         }
 
@@ -221,27 +225,34 @@ public class GameService {
         }
 
         List<Player> players = game.getPlayers();
+        Player oldLeader = players.get(game.getLeader());
+        int nextLeaderPlace = game.getNextLeader();
+        Player nextLeader = players.get(nextLeaderPlace);
+        oldLeader.setLeader(false);
+        nextLeader.setLeader(true);
 
-        Round round = Round.builder()
+        Round newRound = Round.builder()
                 .gameId(gameId)
-                .number(game.getCurrentRound().getNumber() + 1)
-                .leader(players.get(game.getNextLeader() - 1))
-//                .tableCards(List.of(new Move[players.size()]))
+                .number(round.getNumber() + 1)
+                .leader(nextLeader)
+                .tableCards(TableCard.makeEmptyTableCards(players.size()))
                 .status(RoundStatus.WRITING_SECRET)
                 .build();
-        game.setCurrentRound(round);
+        game.setCurrentRound(newRound);
         return game;
     }
 
     public synchronized Game deleteGame(User user, int gameId) {
 
-        Game game = createdGames.remove(gameId);                    //may be required game obj to remove
+        Game game = createdGames.get(gameId);
         if (user.getId() != game.getCreator().getId()) {
             return null;                                     // make exception
+        } else {
+            return createdGames.remove(gameId);
         }
-
-        return game;
     }
+
+
 
     private synchronized LinkedList<Card> collectAllCardsAndShuffle(List<Pack> packs) {
 
@@ -265,30 +276,7 @@ public class GameService {
 
 
 
-    private int[] endVoteAndCalcPoints(Round round) {
 
-        round.setStatus(RoundStatus.POINTS_CALC);
-        int[] votes = round.getPlayerVotes();
-        int number = votes.length;
-        int[] points = new int[number];
-
-        int leaderCardNumber = round.findNumberLeaderCard();
-        int numberGuessedLeaderCard = 0;
-
-        for (int i = 1; i < number; i++ ) {
-            if (votes[i] == leaderCardNumber) {
-                numberGuessedLeaderCard++;
-                points[i] += 3;
-            } else {
-                points[round.getTableCards().get(votes[i]).getPlayerPlace()] += 1;
-            }
-        }
-        if (numberGuessedLeaderCard > 0 && numberGuessedLeaderCard < number - 1) {
-            points[round.getLeader().getPlace()] += 3 + numberGuessedLeaderCard;
-        }
-        round.setPlayerPoints(points);
-        return points;
-    }
 
 
 

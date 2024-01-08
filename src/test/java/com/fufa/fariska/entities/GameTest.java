@@ -143,7 +143,7 @@ public class GameTest {
             }
             game.setPlayers(players);
 
-            int[] points = new int[]{0, 1, 2, 3, 4};
+            int[] points = new int[]{1, 2, 3, 4};
 
             game.addAllPoints(points);
 
@@ -169,7 +169,7 @@ public class GameTest {
             }
             game.setPlayers(players);
 
-            int[] points = new int[]{0, 1, 2, 3, 4};
+            int[] points = new int[]{1, 2, 3, 4};
 
             game.addAllPoints(points);
 
@@ -186,7 +186,7 @@ public class GameTest {
         public void shouldGetNextLeaderWhenUseForFirstLeaderPlayer() {
 
             Game game = Game.builder()
-                    .leader(1)
+                    .leader(0)
                     .freeAvatars(Avatar.getAll())
                     .build();
 
@@ -200,12 +200,34 @@ public class GameTest {
 
             game.setPlayers(players);
 
-            Assertions.assertEquals(2, game.getNextLeader());
-            Assertions.assertEquals(2, game.getLeader());
+            Assertions.assertEquals(1, game.getNextLeader());
+            Assertions.assertEquals(1, game.getLeader());
         }
 
         @Test
         public void shouldGetNextLeaderWhenUseForMiddleLeaderPlayer() {
+
+            Game game = Game.builder()
+                    .leader(2)
+                    .freeAvatars(Avatar.getAll())
+                    .build();
+
+            ArrayList<Player> players = new ArrayList<>();
+
+            for (int i = 0; i < 4; i++) {
+                players.add(Player.builder()
+                        .avatar(game.getFreeAvatar())
+                        .build());
+            }
+
+            game.setPlayers(players);
+
+            Assertions.assertEquals(3, game.getNextLeader());
+            Assertions.assertEquals(3, game.getLeader());
+        }
+
+        @Test
+        public void shouldGetNextLeaderWhenUseForLastLeaderPlayer() {
 
             Game game = Game.builder()
                     .leader(3)
@@ -222,30 +244,8 @@ public class GameTest {
 
             game.setPlayers(players);
 
-            Assertions.assertEquals(4, game.getNextLeader());
-            Assertions.assertEquals(4, game.getLeader());
-        }
-
-        @Test
-        public void shouldGetNextLeaderWhenUseForLastLeaderPlayer() {
-
-            Game game = Game.builder()
-                    .leader(4)
-                    .freeAvatars(Avatar.getAll())
-                    .build();
-
-            ArrayList<Player> players = new ArrayList<>();
-
-            for (int i = 0; i < 4; i++) {
-                players.add(Player.builder()
-                        .avatar(game.getFreeAvatar())
-                        .build());
-            }
-
-            game.setPlayers(players);
-
-            Assertions.assertEquals(1, game.getNextLeader());
-            Assertions.assertEquals(1, game.getLeader());
+            Assertions.assertEquals(0, game.getNextLeader());
+            Assertions.assertEquals(0, game.getLeader());
         }
     }
 

@@ -25,62 +25,62 @@ public class GameController {
     }
 
     @GetMapping("/games/{id}")
-    public Game getGame(@PathVariable int id) {
-        return gameService.findGame(id);
-    } //return GameDTO?
+    public GameDto getGame(@PathVariable int id) {
+        return gameService.findGame(id).makeDto();
+    }
+
+    @GetMapping("/games/{id}/round")
+    public RoundDto getRound(@PathVariable int id) {
+        return gameService.findGame(id).getCurrentRound().makeDto();
+    }
 
     @PostMapping("/games")
     public GameDto createGame(@AuthenticationPrincipal User user, @RequestBody GameRequestDto gameRequestDto) {
-        Game newGame = gameService.makeNewGame(gameRequestDto, user);
-        return GameDto.builder()
-                .id(newGame.getId())
-                .create_time(newGame.getCreate_time())
-                .creator(newGame.getCreator())
-                .status(newGame.getStatus())
-                .players(newGame.getPlayers())
-                .build();
+        return gameService.makeNewGame(user, gameRequestDto).makeDto();
     }
 
     @PostMapping("/games/{id}/join")
-    public Player joinGame(@AuthenticationPrincipal User user, @PathVariable int gameId) {
+    public PlayerDto joinGame(@AuthenticationPrincipal User user, @PathVariable int gameId) {
 
-        return gameService.joinNewPlayer(user, gameId);                 // make DTO
+        return gameService.joinNewPlayer(user, gameId).makeDto();
     }
 
     @PostMapping("/games/{id}/start")
-    public Game startGame(@AuthenticationPrincipal User user, @PathVariable int gameId) {
+    public GameDto startGame(@AuthenticationPrincipal User user, @PathVariable int gameId) {
 
-        return gameService.startGame(user, gameId);                 // make DTO
+        return gameService.startGame(user, gameId).makeDto();
     }
 
     @PostMapping("/games/{id}/secret")
-    public Game createSecret(@AuthenticationPrincipal User user, @PathVariable int gameId,
+    public GameDto createSecret(@AuthenticationPrincipal User user, @PathVariable int gameId,
                              @RequestBody SecretRequestDto secretRequestDto) {
 
-        return gameService.makeSecret(user, gameId, secretRequestDto);                 // make DTO
+        return gameService.makeSecret(user, gameId, secretRequestDto).makeDto();
     }
 
     @PostMapping("/games/{id}/move")
-    public Game createMove(@AuthenticationPrincipal User user, @PathVariable int gameId,
+    public GameDto createMove(@AuthenticationPrincipal User user, @PathVariable int gameId,
                              @RequestBody MoveRequestDto secretRequestDto) {
 
-        return gameService.makeMove(user, gameId, secretRequestDto);                 // make DTO
+        return gameService.makeMove(user, gameId, secretRequestDto).makeDto();
     }
 
     @PostMapping("/games/{id}/vote")
-    public Game createVote(@AuthenticationPrincipal User user, @PathVariable int gameId,
+    public GameDto createVote(@AuthenticationPrincipal User user, @PathVariable int gameId,
                            @RequestBody VoteRequestDto voteRequestDto) {
 
-        return gameService.makeVote(user, gameId, voteRequestDto);                 // make DTO
+        return gameService.makeVote(user, gameId, voteRequestDto).makeDto();
     }
 
     @PostMapping("/games/{id}/next")
-    public Game createNextRound(@AuthenticationPrincipal User user, @PathVariable int gameId) {
+    public GameDto createNextRound(@AuthenticationPrincipal User user, @PathVariable int gameId) {
 
-        return gameService.startNextRound(user, gameId);                 // make DTO
+        return gameService.startNextRound(user, gameId).makeDto();
     }
 
+    @PostMapping("/games/{id}/delete")
+    public GameDto removeGame(@AuthenticationPrincipal User user, @PathVariable int gameId) {
 
-
-
+        return gameService.deleteGame(user, gameId).makeDto();
+    }
 }

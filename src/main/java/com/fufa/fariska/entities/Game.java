@@ -1,8 +1,8 @@
 package com.fufa.fariska.entities;
 
+import com.fufa.fariska.dto.GameDto;
 import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
-import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
@@ -15,7 +15,7 @@ import java.util.Set;
 @Data
 public class Game {
     private int id;
-    private Instant create_time;
+    private Instant createTime;
     private User creator;
     private GameStatus status;
     private List<Player> players;
@@ -61,17 +61,17 @@ public class Game {
     }
 
     public void addAllPoints(int[] pointsArray) {
-        int i = 1;
+        int i = 0;
         for (Player player : players) {
             player.addPoints(pointsArray[i++]);
         }
     }
 
     public int getNextLeader() {
-        if (leader < players.size()) {
+        if (leader < players.size() - 1) {
             leader += 1;
         } else {
-            leader = 1;
+            leader = 0;
         }
         return leader;
     }
@@ -79,6 +79,17 @@ public class Game {
     public Game finish() {
         status = GameStatus.GAME_OVER;
         return this;
+    }
+
+    public GameDto makeDto() {
+        return GameDto.builder()
+                .id(id)
+                .create_time(createTime)
+                .status(status)
+                .players(players)
+                .currentRound(currentRound.getNumber())
+                .leader(leader)
+                .build();
     }
 
 

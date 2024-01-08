@@ -1,5 +1,7 @@
 package com.fufa.fariska.entities;
 
+import com.fufa.fariska.dto.GameDto;
+import com.fufa.fariska.dto.RoundDto;
 import com.fufa.fariska.entities.enums.RoundStatus;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -15,19 +17,16 @@ public class Round {
     private int number;
     private Player leader;
     private Card leaderCard;
-    private int leaderCardNumber;
     private String secret;
     private List<TableCard> tableCards;
-    private int[] playerMoves; // may be - to TableCard
     private int numberMoves;
-    private int[] playerVotes; // may be - to TableCard
     private int numberVotes;
     private int[] playerPoints;
     private RoundStatus status;
     private boolean lastRound;
 
     public void putCardOnTable(int place, Card card, boolean isLeaderCard) {
-        tableCards.add(TableCard.builder()
+        tableCards.set(place, TableCard.builder()
                 .playerPlace(place)
                 .isSecretCard(isLeaderCard)
                 .card(card)
@@ -40,17 +39,27 @@ public class Round {
     public int findNumberLeaderCard() {
         int ans = 0;
         for (TableCard tableCard : tableCards) {
-            ans++;
-            if (tableCard.getCard().equals(leaderCard)) {
+            if (tableCard.isSecretCard()) {
                 return ans;
             }
+            ans++;
         }
-        return 0;
+        return -1;
+    }
+
+    public int findNumberNoLeaderCardNoPlayer(int playerPlace) {
+        int ans = 0;
+        for (TableCard tableCard : tableCards) {
+            if (!tableCard.isSecretCard() && tableCard.getPlayerPlace() != playerPlace) {
+                return ans;
+            }
+            ans++;
+        }
+        return -1;
     }
 
     public boolean didPlayerMakeMove(int place) {
-        //check if player made move
-        return false;
+        return !(tableCards.get(place) == null);
     }
 
     public boolean didPlayerMakeVote(int place) {
@@ -60,21 +69,50 @@ public class Round {
 
     public void endMoveAndStartVoting() {
 
-        System.out.println("endMoveAndStartVoting " + this.getTableCards());
-
         Collections.shuffle(tableCards);
-//        int[] movies = new int[round.getTableCards().size() + 1];
-//        int cardPosition = 1;
-//        for (TableCard tableCard : tableCards) {
-//            movies[tableCard.getPlayerPlace()] = cardPosition++;
-//        }
-//        round.setPlayerMoves(movies);
-//
-//        int[] votes = new int[round.getTableCards().size() + 1];
-//        round.setPlayerVotes(votes);
-
         status = RoundStatus.VOTING;
+
+        System.out.println("After -> endMoveAndStartVoting " + this.tableCards);
     }
 
+    public int[] endVoteAndCalcPoints() {
 
+        this.status = RoundStatus.POINTS_CALC;
+        int number = tableCards.size();
+        playerPoints = new int[number];
+
+        int leaderCardNumber = findNumberLeaderCard();
+        int numberGuessedLeaderCard = tableCards.get(leaderCardNumber).getVotes().size();
+
+        for (TableCard tableCard : tableCards) {
+            if (tableCard.isSecretCard()) {
+                List<Integer> guessedSecret = tableCard.getVotes();
+                for (Integer place : guessedSecret) {
+                    playerPoints[place] += 3;
+                }
+            } else {
+                playerPoints[tableCard.getPlayerPlace()] += tableCard.getVotes().size();
+            }
+        }
+        if (numberGuessedLeaderCard > 0 && numberGuessedLeaderCard < number - 1) {
+            playerPoints[tableCards.get(leaderCardNumber).getPlayerPlace()] += 3 + numberGuessedLeaderCard;
+        }
+        return playerPoints;
+    }
+
+    public RoundDto makeDto() {
+        return RoundDto.builder()
+                .gameId(gameId)
+                .number(number)
+                .leader(leader)
+                .leaderCard(leaderCard)
+                .tableCards(tableCards)
+                .secret(secret)
+                .numberMoves(numberMoves)
+                .numberVotes(numberVotes)
+                .playerPoints(playerPoints)
+                .status(status)
+                .lastRound(lastRound)
+                .build();
+    }
 }
