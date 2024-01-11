@@ -9,28 +9,34 @@ import com.fufa.fariska.repositories.PackRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 
 @Service
-//@AllArgsConstructor
+@AllArgsConstructor
 public class GameService {
 
     public PackRepository packRepository;
-    @Value("0")
-    private Integer totalGames;
+//    @Value("0")
+//    private Integer totalGames;
     public Map<Integer, Game> createdGames;
 
-    @Autowired
-    public void setTotalGames() {
-        totalGames = 0;
-    }
+//    @Autowired
+//    public void setTotalGames() {
+//        totalGames = 0;
+//    }
+
+//    @Bean
+//    public Integer setTotalGames() {
+//        return 0;
+//    }
 
     public synchronized Game makeNewGame(User user, GameRequestDto gameRequestDto) {
 
-        int gameId = ++totalGames;
+        int gameId = ++Game.totalGames;
 
         Set<Integer> packsId = gameRequestDto.getPacksId();
         List<Pack> packs = packRepository.getPacks(packsId);

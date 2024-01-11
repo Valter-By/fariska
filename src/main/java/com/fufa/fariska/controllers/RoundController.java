@@ -9,7 +9,7 @@ import java.util.List;
 @RestController
 public class RoundController {
     
-    @GetMapping("/players/{gameId}/{roundNumber}")
+    @GetMapping("/round/{gameId}/{roundNumber}")
     public String getRound(@PathVariable int gameId, @PathVariable int roundNumber) {
         return "Round " + roundNumber + " in Game " + gameId;
     }

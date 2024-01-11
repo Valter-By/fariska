@@ -14,6 +14,9 @@ import java.util.Set;
 @SuperBuilder
 @Data
 public class Game {
+
+    public static Integer totalGames = 0;
+
     private int id;
     private Instant createTime;
     private User creator;

@@ -43,6 +43,7 @@ public class GameServiceTest {
     @BeforeEach
     public synchronized void makeData() {
 
+        Game.totalGames = 0;
         cards1 = new ArrayList<>();
         cards2 = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
@@ -112,7 +113,8 @@ public class GameServiceTest {
 //        packRepository = Mockito.mock(PackRepository.class);
 //        Mockito.when(packRepository.getPacks(packsId)).thenReturn(packs);
         packRepository = new PackRepository(packs);
-        gameService = new GameService();
+        gameService = new GameService(packRepository, new HashMap<>());
+//        gameService.setTotalGames();
     }
 
     @Nested
