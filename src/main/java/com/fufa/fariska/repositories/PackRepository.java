@@ -3,16 +3,16 @@ package com.fufa.fariska.repositories;
 import com.fufa.fariska.entities.Pack;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
-@AllArgsConstructor
 public class PackRepository {
 
-    private List<Pack> allPacks = new ArrayList<>();
+    private final List<Pack> allPacks = new ArrayList<>();
 
     public void makeFirstPack() {
         allPacks.add(1, Pack.builder()

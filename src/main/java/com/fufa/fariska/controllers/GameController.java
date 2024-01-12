@@ -1,32 +1,37 @@
 package com.fufa.fariska.controllers;
 
 import com.fufa.fariska.dto.*;
-import com.fufa.fariska.entities.Game;
-import com.fufa.fariska.entities.Player;
-import com.fufa.fariska.entities.User;
+import com.fufa.fariska.entities.*;
 import com.fufa.fariska.entities.enums.GameStatus;
+import com.fufa.fariska.repositories.PackRepository;
 import com.fufa.fariska.services.GameService;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 public class GameController {
 
-    public GameService gameService;
+    public final GameService gameService;
 
     @GetMapping("/games")
-    public Map<Integer, Game> getCreatedGames() {
+    public String getCreatedGames() { //Map<Integer, Game>
         return gameService.findAllCreatedGames(); // may be return just don't finished games in Map by id
     }
 
-    @GetMapping("/games/{id}")
-    public GameDto getGame(@PathVariable int id) {
-        return gameService.findGame(id).makeDto();
+    @GetMapping("/games/{id}") //
+    public GameDto getGame(@PathVariable("id") final int id) { //
+        System.out.println("GameService - " + this.gameService);
+        return gameService.findGame(1).makeDto();
     }
 
     @GetMapping("/games/{id}/round")

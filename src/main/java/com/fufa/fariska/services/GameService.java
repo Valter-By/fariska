@@ -7,22 +7,52 @@ import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
 import com.fufa.fariska.repositories.PackRepository;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
 
 import java.time.Instant;
 import java.util.*;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class GameService {
 
-    public PackRepository packRepository;
-//    @Value("0")
-//    private Integer totalGames;
-    public Map<Integer, Game> createdGames;
+    public final PackRepository packRepository;
+    public final Map<Integer, Game> createdGames = new HashMap<>();
+
+//    {
+//        Game.totalGames = 0;
+//        List<Card> cards1 = new ArrayList<>();
+//        List<Card> cards2 = new ArrayList<>();
+//        cards2 = new ArrayList<>();
+//        for (int i = 0; i < 50; i++) {
+//            cards1.add(Card.builder()
+//                    .packId(1)
+//                    .name("one-" + i)
+//                    .build());
+//            cards2.add(Card.builder()
+//                    .packId(2)
+//                    .name("two-" + i)
+//                    .build());
+//        }
+//        List<Pack> packs = new ArrayList<>();
+//        packs.add(null);
+//        packs.add(1, Pack.builder()
+//                .id(1)
+//                .cards(cards1)
+//                .build());
+//        packs.add(2, Pack.builder()
+//                .id(2)
+//                .cards(cards2)
+//                .build());
+//        packRepository = new PackRepository(packs);
+//        createdGames = new HashMap<>();
+//    }
 
 //    @Autowired
 //    public void setTotalGames() {
@@ -69,8 +99,8 @@ public class GameService {
         return createdGames.get(id);
     }
 
-    public synchronized Map<Integer, Game> findAllCreatedGames() {
-        return createdGames;
+    public synchronized String findAllCreatedGames() { //Map<Integer, Game>
+        return "map - " + this.createdGames;
     }
 
     public synchronized Player joinNewPlayer(User user, int gameId) {

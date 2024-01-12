@@ -108,12 +108,10 @@ public class GameServiceTest {
                 .cards(cards2)
                 .build());
 
-
-
 //        packRepository = Mockito.mock(PackRepository.class);
 //        Mockito.when(packRepository.getPacks(packsId)).thenReturn(packs);
         packRepository = new PackRepository(packs);
-        gameService = new GameService(packRepository, new HashMap<>());
+        gameService = new GameService(packs, packRepository, new HashMap<>());
 //        gameService.setTotalGames();
     }
 
