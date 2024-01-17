@@ -12,10 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,14 +21,13 @@ public class GameController {
     public final GameService gameService;
 
     @GetMapping("/games")
-    public String getCreatedGames() { //Map<Integer, Game>
-        return gameService.findAllCreatedGames(); // may be return just don't finished games in Map by id
+    public Set<Integer> getCreatedGames() {
+        return gameService.findAllCreatedGames(); // may be return some game's info in Map by id
     }
 
-    @GetMapping("/games/{id}") //
-    public GameDto getGame(@PathVariable("id") final int id) { //
-        System.out.println("GameService - " + this.gameService);
-        return gameService.findGame(1).makeDto();
+    @GetMapping("/games/{id}")
+    public GameDto getGame(@PathVariable("id") final int id) {
+        return gameService.findGame(id).makeDto();
     }
 
     @GetMapping("/games/{id}/round")
@@ -41,6 +37,7 @@ public class GameController {
 
     @PostMapping("/games")
     public GameDto createGame(@AuthenticationPrincipal User user, @RequestBody GameRequestDto gameRequestDto) {
+
         return gameService.makeNewGame(user, gameRequestDto).makeDto();
     }
 

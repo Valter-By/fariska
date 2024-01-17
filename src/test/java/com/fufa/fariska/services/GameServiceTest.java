@@ -111,7 +111,7 @@ public class GameServiceTest {
 //        packRepository = Mockito.mock(PackRepository.class);
 //        Mockito.when(packRepository.getPacks(packsId)).thenReturn(packs);
         packRepository = new PackRepository(packs);
-        gameService = new GameService(packs, packRepository, new HashMap<>());
+        gameService = new GameService(packRepository);
 //        gameService.setTotalGames();
     }
 
@@ -123,7 +123,7 @@ public class GameServiceTest {
 
             Game game = gameService.makeNewGame(user, gameRequestDto);
 
-            Assertions.assertEquals(game, gameService.findAllCreatedGames().get(1));
+            Assertions.assertTrue(gameService.findAllCreatedGames().contains(1));
             Assertions.assertEquals(1, gameService.findAllCreatedGames().size());
             Assertions.assertEquals(1, game.getId());
             Assertions.assertEquals(user, game.getCreator());
@@ -135,7 +135,6 @@ public class GameServiceTest {
             Assertions.assertTrue(game.getCards().containsAll(cards2));
             Assertions.assertFalse(game.getFreeAvatars().contains(game.getPlayers().get(0).getAvatar()));
             Assertions.assertEquals(Avatar.values().length - 1, game.getFreeAvatars().size());
-            System.out.println();
         }
     }
 
@@ -162,10 +161,10 @@ public class GameServiceTest {
             Game game1 = gameService.makeNewGame(user, gameRequestDto);
             Game game2 = gameService.makeNewGame(user2, gameRequestDto2);
             Game game3 = gameService.makeNewGame(user, gameRequestDto3);
-            HashMap<Integer, Game> expected = new HashMap<>();
-            expected.put(3, game3);
-            expected.put(1, game1);
-            expected.put(2, game2);
+            Set<Integer> expected = new HashSet<>();
+            expected.add(3);
+            expected.add(1);
+            expected.add(2);
 
             Assertions.assertEquals(expected, gameService.findAllCreatedGames());
         }

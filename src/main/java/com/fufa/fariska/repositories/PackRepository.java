@@ -10,9 +10,10 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
+@RequiredArgsConstructor
 public class PackRepository {
 
-    private final List<Pack> allPacks = new ArrayList<>();
+    private final List<Pack> allPacks;
 
     public void makeFirstPack() {
         allPacks.add(1, Pack.builder()

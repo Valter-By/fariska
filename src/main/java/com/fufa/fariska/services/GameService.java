@@ -6,14 +6,8 @@ import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
 import com.fufa.fariska.repositories.PackRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
 
 import java.time.Instant;
 import java.util.*;
@@ -24,6 +18,36 @@ public class GameService {
 
     public final PackRepository packRepository;
     public final Map<Integer, Game> createdGames = new HashMap<>();
+
+//    {
+//        List<Player> players = new ArrayList<>(9);
+//        User user = User.builder()
+//                .name("Fufa")
+//                .id(1)
+//                .build();
+//        players.add(Player.builder()
+//                .user(user)
+//                .gameId(1)
+//                .avatar(null)
+//                .build());
+//        createdGames.put(1, Game.builder()
+//                .id(1)
+//                .createTime(Instant.now())
+//                .creator(user)
+//                .players(players)
+//                .status(GameStatus.WAITING_FOR_PLAYERS)
+//                .packsId(new HashSet<>(List.of(1, 2)))
+//                .cards(new LinkedList<>())
+//                .currentRound(Round.builder()
+//                        .gameId(1)
+//                        .number(1)
+//                        .leader(players.get(0))
+//                        .tableCards(TableCard.makeEmptyTableCards(players.size()))
+//                        .status(RoundStatus.WRITING_SECRET)
+//                        .build())
+//                .freeAvatars(Avatar.getAll())
+//                .build());
+//    }
 
 //    {
 //        Game.totalGames = 0;
@@ -99,8 +123,8 @@ public class GameService {
         return createdGames.get(id);
     }
 
-    public synchronized String findAllCreatedGames() { //Map<Integer, Game>
-        return "map - " + this.createdGames;
+    public synchronized Set<Integer> findAllCreatedGames() {
+        return this.createdGames.keySet();
     }
 
     public synchronized Player joinNewPlayer(User user, int gameId) {
@@ -186,7 +210,7 @@ public class GameService {
         }
 
         if (round.getNumber() != moveRequestDto.getRound() || game.getStatus() != GameStatus.PLAYING
-        || round.getStatus() != RoundStatus.MAKING_MOVIES) {
+                || round.getStatus() != RoundStatus.MAKING_MOVIES) {
             return null;                                     // make exception
         }
 
@@ -289,7 +313,6 @@ public class GameService {
     }
 
 
-
     private synchronized LinkedList<Card> collectAllCardsAndShuffle(List<Pack> packs) {
 
         LinkedList<Card> cards = new LinkedList<>();
@@ -311,11 +334,4 @@ public class GameService {
     }
 
 
-
-
-
-
-
-
-
-    }
+}
