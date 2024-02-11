@@ -1,6 +1,8 @@
 package com.fufa.fariska.dto;
 
+import jakarta.validation.constraints.Max;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
@@ -9,5 +11,11 @@ import java.util.Set;
 @Data
 public class GameRequestDto {
 
-    Set<Integer> packsId;
+    public GameRequestDto() {
+
+    }
+
+//    Set<Integer> packsId;
+    @Max(100)
+    private Integer packsId;
 }

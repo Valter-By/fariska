@@ -1,18 +1,14 @@
 package com.fufa.fariska.controllers;
 
 import com.fufa.fariska.dto.*;
-import com.fufa.fariska.entities.*;
-import com.fufa.fariska.entities.enums.GameStatus;
-import com.fufa.fariska.repositories.PackRepository;
+import com.fufa.fariska.entities.User;
 import com.fufa.fariska.services.GameService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,11 +16,13 @@ public class GameController {
 
     public final GameService gameService;
 
+    @CrossOrigin
     @GetMapping("/games")
     public Set<Integer> getCreatedGames() {
         return gameService.findAllCreatedGames(); // may be return some game's info in Map by id
     }
 
+    @CrossOrigin
     @GetMapping("/games/{id}")
     public GameDto getGame(@PathVariable("id") final int id) {
         return gameService.findGame(id).makeDto();
@@ -36,9 +34,8 @@ public class GameController {
     }
 
     @PostMapping("/games")
-    public GameDto createGame(@AuthenticationPrincipal User user, @RequestBody GameRequestDto gameRequestDto) {
-
-        return gameService.makeNewGame(user, gameRequestDto).makeDto();
+    public GameDto createGame(@Valid @RequestBody GameRequestDto gameRequestDto) { //@AuthenticationPrincipal User user // GameDto
+        return gameService.makeNewGame(User.builder().id(17).gmail("a@b.c").nickname("Nick").build(), gameRequestDto).makeDto();
     }
 
     @PostMapping("/games/{id}/join")

@@ -22,9 +22,10 @@ public class Game {
     private User creator;
     private GameStatus status;
     private List<Player> players;
-    private Round currentRound;
+    private Round currentRound; //maybe to change for number and store rounds separately and call throw repository
     private int leader;
-    private Set<Integer> packsId;
+//    private Set<Integer> packsId;
+    private Integer packsId;
     private LinkedList<Card> cards;
     private LinkedList<Avatar> freeAvatars;
 

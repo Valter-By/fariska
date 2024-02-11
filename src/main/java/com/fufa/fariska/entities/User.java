@@ -29,7 +29,7 @@ public class User implements Principal {
 
     @Override
     public String getName() {
-        httpServletRequest.getLocalAddr();
+//        httpServletRequest.getLocalAddr();
         return gmail;
     }
 

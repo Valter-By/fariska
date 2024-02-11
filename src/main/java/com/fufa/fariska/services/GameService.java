@@ -92,8 +92,9 @@ public class GameService {
 
         int gameId = ++Game.totalGames;
 
-        Set<Integer> packsId = gameRequestDto.getPacksId();
-        List<Pack> packs = packRepository.getPacks(packsId);
+//        Set<Integer> packsId = gameRequestDto.getPacksId();
+        Integer packsId = gameRequestDto.getPacksId();
+        List<Pack> packs = packRepository.getPacks(Set.of(packsId));
         LinkedList<Card> cards = collectAllCardsAndShuffle(packs);
 
         Game game = Game.builder()
@@ -101,6 +102,7 @@ public class GameService {
                 .createTime(Instant.now())
                 .creator(user)
                 .status(GameStatus.WAITING_FOR_PLAYERS)
+                .currentRound(Round.builder().number(0).build())
                 .packsId(packsId)
                 .cards(cards)
                 .freeAvatars(Avatar.getAll())

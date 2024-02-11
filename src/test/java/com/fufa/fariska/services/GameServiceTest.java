@@ -9,6 +9,7 @@ import com.fufa.fariska.entities.*;
 import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
+import com.fufa.fariska.repositories.CardRepository;
 import com.fufa.fariska.repositories.PackRepository;
 import org.junit.jupiter.api.*;
 
@@ -31,7 +32,8 @@ public class GameServiceTest {
     SecretRequestDto secretRequestDto;
     MoveRequestDto moveRequestDto;
     MoveRequestDto moveRequestDto2;
-    Set<Integer> packsId;
+//    Set<Integer> packsId;
+    Integer packsId;
     List<Pack> packs;
 
     List<Card> cards1;
@@ -44,27 +46,19 @@ public class GameServiceTest {
     public synchronized void makeData() {
 
         Game.totalGames = 0;
-        cards1 = new ArrayList<>();
-        cards2 = new ArrayList<>();
-        for (int i = 0; i < 50; i++) {
-            cards1.add(Card.builder()
-                    .packId(1)
-                    .name("one-" + i)
-                    .build());
-            cards2.add(Card.builder()
-                    .packId(2)
-                    .name("two-" + i)
-                    .build());
-        }
-        packsId = new HashSet<>(List.of(1, 2));
+
+//        packsId = new HashSet<>(List.of(1, 2));
+        packsId = 1;
         gameRequestDto = GameRequestDto.builder()
                 .packsId(packsId)
                 .build();
         gameRequestDto2 = GameRequestDto.builder()
-                .packsId(new HashSet<>(List.of(2)))
+                .packsId(0)
+//                .packsId(new HashSet<>(List.of(2)))
                 .build();
         gameRequestDto3 = GameRequestDto.builder()
-                .packsId(new HashSet<>(List.of(1)))
+                .packsId(1)
+//                .packsId(new HashSet<>(List.of(1)))
                 .build();
 
         secretRequestDto = SecretRequestDto.builder()
@@ -85,32 +79,33 @@ public class GameServiceTest {
                 .build();
 
         user = User.builder()
-                .name("Fufa")
+                .nickname("Fufa")
                 .id(1)
                 .build();
         user2 = User.builder()
-                .name("Fariska")
+                .nickname("Fariska")
                 .id(2)
                 .build();
         user3 = User.builder()
-                .name("Fedora")
+                .nickname("Fedora")
                 .id(3)
                 .build();
 
-        packs = new ArrayList<>();
-        packs.add(null);
-        packs.add(1, Pack.builder()
-                .id(1)
-                .cards(cards1)
-                .build());
-        packs.add(2, Pack.builder()
-                .id(2)
-                .cards(cards2)
-                .build());
+//        packs = new ArrayList<>();
+//        packs.add(null);
+//        packs.add(1, Pack.builder()
+//                .id(1)
+//                .cards(cards1)
+//                .build());
+//        packs.add(2, Pack.builder()
+//                .id(2)
+//                .cards(cards2)
+//                .build());
 
 //        packRepository = Mockito.mock(PackRepository.class);
 //        Mockito.when(packRepository.getPacks(packsId)).thenReturn(packs);
-        packRepository = new PackRepository(packs);
+
+        packRepository = new PackRepository();
         gameService = new GameService(packRepository);
 //        gameService.setTotalGames();
     }
