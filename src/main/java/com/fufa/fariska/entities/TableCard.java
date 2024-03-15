@@ -22,7 +22,6 @@ public class TableCard {
         for (int i = 0; i < n; i++) {
             list.add(null);
         }
-        System.out.println("makeEmptyTableCards" + list.size());
         return list;
     }
 }

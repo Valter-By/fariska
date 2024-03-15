@@ -15,7 +15,7 @@ public class GameDto {
     private long id;
     private Instant create_time;
     private GameStatus status;
-    private List<Player> players;
+    private List<PlayerDto> players;
     private int currentRound;
     private int leader;
 }

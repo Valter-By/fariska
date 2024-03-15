@@ -11,10 +11,8 @@ import java.util.List;
 @SuperBuilder
 @Data
 public class PlayerDto {
-    private int gameId;
+    private int gameId; //is required?
     private int place;
     private Avatar avatar;
-    private List<Card> handCards;
     private int points;
-
 }

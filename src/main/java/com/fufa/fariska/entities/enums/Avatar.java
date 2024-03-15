@@ -10,7 +10,12 @@ public enum Avatar {
     RED_CAR,
     YELLOW_SUB,
     PINK_ELEPHANT,
-    BLACK_CAT;
+    BLACK_CAT,
+    WHITE_SNOW,
+    BLUE_STAR,
+    PURPLE_MOON,
+    GREEN_APPLE,
+    BROWN_CAKE;
 
     public static LinkedList<Avatar> getAll() {
         Avatar[] avatars = values();

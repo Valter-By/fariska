@@ -12,6 +12,7 @@ import java.util.*;
 //@RequiredArgsConstructor
 
 public class CardRepository {
+    //maybe it's not necessary, but there are some tests
 
     private final List<LinkedList<Card>> allPacksCard = new ArrayList<>(); //may be make Map
 

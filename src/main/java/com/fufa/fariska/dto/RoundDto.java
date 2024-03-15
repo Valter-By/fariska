@@ -16,7 +16,6 @@ import java.util.List;
 public class RoundDto {
     private int gameId;
     private int number;
-    private Player leader;
     private Card leaderCard;
     private List<TableCard> tableCards;
     private String secret;

@@ -1,6 +1,7 @@
 package com.fufa.fariska.entities;
 
 import com.fufa.fariska.dto.GameDto;
+import com.fufa.fariska.dto.PlayerCardsDto;
 import com.fufa.fariska.dto.RoundDto;
 import com.fufa.fariska.entities.enums.RoundStatus;
 import lombok.Data;
@@ -104,7 +105,6 @@ public class Round {
         return RoundDto.builder()
                 .gameId(gameId)
                 .number(number)
-                .leader(leader)
                 .leaderCard(leaderCard)
                 .tableCards(tableCards)
                 .secret(secret)

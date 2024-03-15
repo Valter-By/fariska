@@ -28,9 +28,17 @@ public class GameController {
         return gameService.findGame(id).makeDto();
     }
 
+    //get current round separately from a game
+    @CrossOrigin
     @GetMapping("/games/{id}/round")
-    public RoundDto getRound(@PathVariable int id) {
+    public RoundDto getRound(@PathVariable("id") final int id) {
         return gameService.findGame(id).getCurrentRound().makeDto();
+    }
+
+    @CrossOrigin
+    @GetMapping("/games/{id}/my-cards/{place}")
+    public PlayerCardsDto getHandCards(@PathVariable("id") final int id, @PathVariable("place") final int place) {
+        return gameService.findGame(id).getPlayers().get(place).makePlayerCardsDto();
     }
 
     @PostMapping("/games")

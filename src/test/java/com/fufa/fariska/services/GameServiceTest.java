@@ -9,7 +9,6 @@ import com.fufa.fariska.entities.*;
 import com.fufa.fariska.entities.enums.Avatar;
 import com.fufa.fariska.entities.enums.GameStatus;
 import com.fufa.fariska.entities.enums.RoundStatus;
-import com.fufa.fariska.repositories.CardRepository;
 import com.fufa.fariska.repositories.PackRepository;
 import org.junit.jupiter.api.*;
 
@@ -19,10 +18,6 @@ import java.util.*;
 public class GameServiceTest {
 
     GameService gameService;
-
-//    @Mock
-//    public CardRepository cardRepository;
-
     //    @Mock
     PackRepository packRepository;
 
@@ -47,7 +42,7 @@ public class GameServiceTest {
 
         Game.totalGames = 0;
 
-//        packsId = new HashSet<>(List.of(1, 2));
+//        packsId = new HashSet<>(List.of(1, 2)); -- issue 12
         packsId = 1;
         gameRequestDto = GameRequestDto.builder()
                 .packsId(packsId)
@@ -125,7 +120,7 @@ public class GameServiceTest {
             Assertions.assertEquals(GameStatus.WAITING_FOR_PLAYERS, game.getStatus());
             Assertions.assertEquals(user, game.getPlayers().get(0).getUser());
             Assertions.assertEquals(packsId, game.getPacksId());
-            Assertions.assertEquals(100, game.getCards().size());
+            Assertions.assertEquals(50, game.getCards().size());
             Assertions.assertTrue(game.getCards().containsAll(cards1));
             Assertions.assertTrue(game.getCards().containsAll(cards2));
             Assertions.assertFalse(game.getFreeAvatars().contains(game.getPlayers().get(0).getAvatar()));
@@ -209,7 +204,7 @@ public class GameServiceTest {
             Assertions.assertEquals(GameStatus.PLAYING, game1.getStatus());
             Assertions.assertEquals(2, game1.getPlayers().size());
             Assertions.assertEquals(0, game1.getLeader());
-            Assertions.assertEquals(88, game1.getCards().size());
+            Assertions.assertEquals(38, game1.getCards().size());
             Assertions.assertEquals(Avatar.values().length - 2, game1.getFreeAvatars().size());
             Assertions.assertEquals(6, player1.getHandCards().size());
             Assertions.assertEquals(6, player2.getHandCards().size());
@@ -237,7 +232,7 @@ public class GameServiceTest {
             Assertions.assertEquals(GameStatus.WAITING_FOR_PLAYERS, game.getStatus());
             Assertions.assertEquals(1, game.getPlayers().size());
             Assertions.assertEquals(0, game.getLeader());
-            Assertions.assertEquals(100, game.getCards().size());
+            Assertions.assertEquals(50, game.getCards().size());
             Assertions.assertEquals(Avatar.values().length - 1, game.getFreeAvatars().size());
             Assertions.assertNull(players.get(0).getHandCards());
             Assertions.assertNull(round);
@@ -264,7 +259,7 @@ public class GameServiceTest {
             Assertions.assertEquals(GameStatus.PLAYING, game.getStatus());
             Assertions.assertEquals(3, game.getPlayers().size());
             Assertions.assertEquals(0, game.getLeader());
-            Assertions.assertEquals(81, game.getCards().size());
+            Assertions.assertEquals(31, game.getCards().size());
             Assertions.assertEquals(6, leader.getHandCards().size());
             Assertions.assertEquals(1, round.getNumber());
             Assertions.assertEquals(leader, round.getLeader());
@@ -299,7 +294,7 @@ public class GameServiceTest {
             gameService.makeMove(player1.getUser(), 1, moveRequestDto);
 
             Assertions.assertEquals(GameStatus.PLAYING, game.getStatus());
-            Assertions.assertEquals(80, game.getCards().size());
+            Assertions.assertEquals(30, game.getCards().size());
             Assertions.assertEquals(6, leader.getHandCards().size());
             Assertions.assertEquals(6, player1.getHandCards().size());
             Assertions.assertEquals(6, player2.getHandCards().size());
@@ -337,7 +332,7 @@ public class GameServiceTest {
             gameService.makeMove(player2.getUser(), 1, moveRequestDto2);
 
             Assertions.assertEquals(GameStatus.PLAYING, game.getStatus());
-            Assertions.assertEquals(79, game.getCards().size());
+            Assertions.assertEquals(29, game.getCards().size());
             Assertions.assertEquals(6, player1.getHandCards().size());
             Assertions.assertEquals(6, player2.getHandCards().size());
             Assertions.assertEquals(1, round.getNumber());
@@ -391,7 +386,7 @@ public class GameServiceTest {
 
             gameService.makeVote(player1.getUser(), 1, voteRequestDto);
 
-            Assertions.assertEquals(79, game.getCards().size());
+            Assertions.assertEquals(29, game.getCards().size());
             Assertions.assertEquals(1, round.getNumber());
             Assertions.assertEquals(round.getLeaderCard(), round.getTableCards().get(secretPlace).getCard());
             Assertions.assertEquals(List.of(1), round.getTableCards().get(secretPlace).getVotes());
@@ -442,7 +437,7 @@ public class GameServiceTest {
             gameService.makeVote(player1.getUser(), 1, voteRequestDto1);
             gameService.makeVote(player2.getUser(), 1, voteRequestDto2);
 
-            Assertions.assertEquals(79, game.getCards().size());
+            Assertions.assertEquals(29, game.getCards().size());
             Assertions.assertEquals(1, round.getNumber());
             Assertions.assertEquals(movedCards[0], round.getTableCards().get(secretCardPlace).getCard());
             Assertions.assertEquals(movedCards[1], round.getTableCards().get(otherCardPlace).getCard());
@@ -510,7 +505,7 @@ public class GameServiceTest {
 
             Assertions.assertEquals(1, game.getLeader());
             Assertions.assertEquals(GameStatus.PLAYING, game.getStatus());
-            Assertions.assertEquals(79, game.getCards().size());
+            Assertions.assertEquals(29, game.getCards().size());
 
             Assertions.assertEquals(4, leader.getPoints());
             Assertions.assertEquals(4, player1.getPoints());

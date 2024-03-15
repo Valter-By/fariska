@@ -19,75 +19,6 @@ public class GameService {
     public final PackRepository packRepository;
     public final Map<Integer, Game> createdGames = new HashMap<>();
 
-//    {
-//        List<Player> players = new ArrayList<>(9);
-//        User user = User.builder()
-//                .name("Fufa")
-//                .id(1)
-//                .build();
-//        players.add(Player.builder()
-//                .user(user)
-//                .gameId(1)
-//                .avatar(null)
-//                .build());
-//        createdGames.put(1, Game.builder()
-//                .id(1)
-//                .createTime(Instant.now())
-//                .creator(user)
-//                .players(players)
-//                .status(GameStatus.WAITING_FOR_PLAYERS)
-//                .packsId(new HashSet<>(List.of(1, 2)))
-//                .cards(new LinkedList<>())
-//                .currentRound(Round.builder()
-//                        .gameId(1)
-//                        .number(1)
-//                        .leader(players.get(0))
-//                        .tableCards(TableCard.makeEmptyTableCards(players.size()))
-//                        .status(RoundStatus.WRITING_SECRET)
-//                        .build())
-//                .freeAvatars(Avatar.getAll())
-//                .build());
-//    }
-
-//    {
-//        Game.totalGames = 0;
-//        List<Card> cards1 = new ArrayList<>();
-//        List<Card> cards2 = new ArrayList<>();
-//        cards2 = new ArrayList<>();
-//        for (int i = 0; i < 50; i++) {
-//            cards1.add(Card.builder()
-//                    .packId(1)
-//                    .name("one-" + i)
-//                    .build());
-//            cards2.add(Card.builder()
-//                    .packId(2)
-//                    .name("two-" + i)
-//                    .build());
-//        }
-//        List<Pack> packs = new ArrayList<>();
-//        packs.add(null);
-//        packs.add(1, Pack.builder()
-//                .id(1)
-//                .cards(cards1)
-//                .build());
-//        packs.add(2, Pack.builder()
-//                .id(2)
-//                .cards(cards2)
-//                .build());
-//        packRepository = new PackRepository(packs);
-//        createdGames = new HashMap<>();
-//    }
-
-//    @Autowired
-//    public void setTotalGames() {
-//        totalGames = 0;
-//    }
-
-//    @Bean
-//    public Integer setTotalGames() {
-//        return 0;
-//    }
-
     public synchronized Game makeNewGame(User user, GameRequestDto gameRequestDto) {
 
         int gameId = ++Game.totalGames;
@@ -313,6 +244,8 @@ public class GameService {
             return createdGames.remove(gameId);
         }
     }
+
+
 
 
     private synchronized LinkedList<Card> collectAllCardsAndShuffle(List<Pack> packs) {

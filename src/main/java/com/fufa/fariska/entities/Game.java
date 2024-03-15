@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import static com.fufa.fariska.utils.MakeListDto.makeListPlayerDto;
+
 @SuperBuilder
 @Data
 public class Game {
@@ -22,7 +24,7 @@ public class Game {
     private User creator;
     private GameStatus status;
     private List<Player> players;
-    private Round currentRound; //maybe to change for number and store rounds separately and call throw repository
+    private Round currentRound;
     private int leader;
 //    private Set<Integer> packsId;
     private Integer packsId;
@@ -90,7 +92,7 @@ public class Game {
                 .id(id)
                 .create_time(createTime)
                 .status(status)
-                .players(players)
+                .players(makeListPlayerDto(players))
                 .currentRound(currentRound.getNumber())
                 .leader(leader)
                 .build();

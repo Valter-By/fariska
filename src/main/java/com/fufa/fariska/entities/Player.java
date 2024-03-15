@@ -1,5 +1,6 @@
 package com.fufa.fariska.entities;
 
+import com.fufa.fariska.dto.PlayerCardsDto;
 import com.fufa.fariska.dto.PlayerDto;
 import com.fufa.fariska.dto.RoundDto;
 import com.fufa.fariska.entities.enums.Avatar;
@@ -36,8 +37,13 @@ public class Player {
                 .gameId(gameId)
                 .place(place)
                 .avatar(avatar)
-                .handCards(handCards)
                 .points(points)
+                .build();
+    }
+
+    public PlayerCardsDto makePlayerCardsDto() {
+        return PlayerCardsDto.builder()
+                .handCards(handCards)
                 .build();
     }
 }

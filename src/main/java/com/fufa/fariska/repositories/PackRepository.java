@@ -23,13 +23,13 @@ public class PackRepository {
         LinkedList<Card> cards2 = new LinkedList<>();
         for (int i = 0; i < 50; i++) {
             cards1.add(Card.builder()
-                    .packId(1)
+                    .packId(0)
                     .number(i)
                     .name("First-" + i)
                     .picture(new File("/resources/pictures/1/picture_1_" + i + ".jpg"))
                     .build());
             cards2.add(Card.builder()
-                    .packId(2)
+                    .packId(1)
                     .number(i)
                     .name("Second-" + i)
                     .picture(new File("/resources/pictures/2/picture_2_" + i + ".jpg"))
