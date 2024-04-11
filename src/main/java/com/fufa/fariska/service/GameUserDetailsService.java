@@ -4,6 +4,7 @@ import com.fufa.fariska.config.GameUserDetails;
 import com.fufa.fariska.dto.GameUserDTO;
 import com.fufa.fariska.entity.GameUser;
 import com.fufa.fariska.repository.UserRepository;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+//@NoArgsConstructor
 public class GameUserDetailsService implements UserDetailsService {
 
 //    @Autowired

@@ -21,7 +21,7 @@ public class UserController {
 
     private final UserService service;
 
-    @PostMapping("new")
+    @PostMapping("/new")
     public ResponseEntity<GameUser> create(@RequestBody GameUserDTO dto) {
         return new ResponseEntity<>(service.create(dto), HttpStatus.OK);
     }
@@ -41,7 +41,7 @@ public class UserController {
         return new ResponseEntity<>(service.update(user), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/{id}")
     public HttpStatus delete(@PathVariable("id") Integer id) {
         service.delete(id);
         return HttpStatus.OK;
