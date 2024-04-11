@@ -1,11 +1,8 @@
-package com.fufa.fariska.repositories;
+package com.fufa.fariska.repository;
 
-import com.fufa.fariska.entities.Card;
-import com.fufa.fariska.entities.Pack;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import com.fufa.fariska.entity.Card;
+import com.fufa.fariska.entity.Pack;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;

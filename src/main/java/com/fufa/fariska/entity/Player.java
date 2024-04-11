@@ -1,9 +1,8 @@
-package com.fufa.fariska.entities;
+package com.fufa.fariska.entity;
 
 import com.fufa.fariska.dto.PlayerCardsDto;
 import com.fufa.fariska.dto.PlayerDto;
-import com.fufa.fariska.dto.RoundDto;
-import com.fufa.fariska.entities.enums.Avatar;
+import com.fufa.fariska.entity.enums.Avatar;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
@@ -12,7 +11,7 @@ import java.util.List;
 @SuperBuilder
 @Data
 public class Player {
-    private User user;
+    private GameUser user;
     private int gameId;
     private int place;
     private Avatar avatar;

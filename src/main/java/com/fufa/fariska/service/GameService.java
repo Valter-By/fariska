@@ -1,11 +1,11 @@
-package com.fufa.fariska.services;
+package com.fufa.fariska.service;
 
 import com.fufa.fariska.dto.*;
-import com.fufa.fariska.entities.*;
-import com.fufa.fariska.entities.enums.Avatar;
-import com.fufa.fariska.entities.enums.GameStatus;
-import com.fufa.fariska.entities.enums.RoundStatus;
-import com.fufa.fariska.repositories.PackRepository;
+import com.fufa.fariska.entity.*;
+import com.fufa.fariska.entity.enums.Avatar;
+import com.fufa.fariska.entity.enums.GameStatus;
+import com.fufa.fariska.entity.enums.RoundStatus;
+import com.fufa.fariska.repository.PackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ public class GameService {
     public final PackRepository packRepository;
     public final Map<Integer, Game> createdGames = new HashMap<>();
 
-    public synchronized Game makeNewGame(User user, GameRequestDto gameRequestDto) {
+    public synchronized Game makeNewGame(GameUser user, GameRequestDto gameRequestDto) {
 
         int gameId = ++Game.totalGames;
 
@@ -33,7 +33,7 @@ public class GameService {
                 .createTime(Instant.now())
                 .creator(user)
                 .status(GameStatus.WAITING_FOR_PLAYERS)
-                .currentRound(Round.builder().number(0).build())
+//                .currentRound(Round.builder().number(0).build())
                 .packsId(packsId)
                 .cards(cards)
                 .freeAvatars(Avatar.getAll())
@@ -60,7 +60,7 @@ public class GameService {
         return this.createdGames.keySet();
     }
 
-    public synchronized Player joinNewPlayer(User user, int gameId) {
+    public synchronized Player joinNewPlayer(GameUser user, int gameId) {
         Game game = createdGames.get(gameId);
 
         if (game.getPlayers().size() >= 9 || game.getStatus() == GameStatus.GAME_OVER) {
@@ -76,12 +76,12 @@ public class GameService {
         return player;
     }
 
-    public synchronized Game startGame(User user, int gameId) {
+    public synchronized Game startGame(GameUser user, int gameId) {
 
         Game game = createdGames.get(gameId);
         if (user.getId() != game.getCreator().getId()
                 || game.getPlayers().size() < 2 || game.getStatus() != GameStatus.WAITING_FOR_PLAYERS) {
-            return game;                                     // make exception
+            return null;                                     // make exception
         }
 
         List<Player> players = game.getPlayers();
@@ -101,7 +101,7 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game makeSecret(User user, int gameId, SecretRequestDto secretRequestDto) {
+    public synchronized Game makeSecret(GameUser user, int gameId, SecretRequestDto secretRequestDto) {
 
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
@@ -130,7 +130,7 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game makeMove(User user, int gameId, MoveRequestDto moveRequestDto) {
+    public synchronized Game makeMove(GameUser user, int gameId, MoveRequestDto moveRequestDto) {
 
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
@@ -162,7 +162,7 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game makeVote(User user, int gameId, VoteRequestDto voteRequestDto) {
+    public synchronized Game makeVote(GameUser user, int gameId, VoteRequestDto voteRequestDto) {
 
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
@@ -203,7 +203,7 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game startNextRound(User user, int gameId) {
+    public synchronized Game startNextRound(GameUser user, int gameId) {
 
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
@@ -235,7 +235,7 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game deleteGame(User user, int gameId) {
+    public synchronized Game deleteGame(GameUser user, int gameId) {
 
         Game game = createdGames.get(gameId);
         if (user.getId() != game.getCreator().getId()) {

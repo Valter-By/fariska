@@ -1,9 +1,8 @@
-package com.fufa.fariska.entities.enums;
+package com.fufa.fariska.entity.enums;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 public enum Avatar {
 

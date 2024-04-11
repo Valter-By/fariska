@@ -1,9 +1,6 @@
-package com.fufa.fariska.repositories;
+package com.fufa.fariska.repository;
 
-import com.fufa.fariska.entities.Card;
-import com.fufa.fariska.entities.Pack;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import com.fufa.fariska.entity.Card;
 
 import java.io.File;
 import java.util.*;

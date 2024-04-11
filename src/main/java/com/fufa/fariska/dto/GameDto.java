@@ -1,8 +1,6 @@
 package com.fufa.fariska.dto;
 
-import com.fufa.fariska.entities.Player;
-import com.fufa.fariska.entities.User;
-import com.fufa.fariska.entities.enums.GameStatus;
+import com.fufa.fariska.entity.enums.GameStatus;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 

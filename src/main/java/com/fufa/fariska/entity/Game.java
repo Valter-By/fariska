@@ -1,15 +1,14 @@
-package com.fufa.fariska.entities;
+package com.fufa.fariska.entity;
 
 import com.fufa.fariska.dto.GameDto;
-import com.fufa.fariska.entities.enums.Avatar;
-import com.fufa.fariska.entities.enums.GameStatus;
+import com.fufa.fariska.entity.enums.Avatar;
+import com.fufa.fariska.entity.enums.GameStatus;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import static com.fufa.fariska.utils.MakeListDto.makeListPlayerDto;
 
@@ -21,7 +20,7 @@ public class Game {
 
     private int id;
     private Instant createTime;
-    private User creator;
+    private GameUser creator;
     private GameStatus status;
     private List<Player> players;
     private Round currentRound;

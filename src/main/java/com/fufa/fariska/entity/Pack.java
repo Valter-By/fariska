@@ -1,10 +1,9 @@
-package com.fufa.fariska.entities;
+package com.fufa.fariska.entity;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
-import java.util.Set;
 
 @SuperBuilder
 @Data

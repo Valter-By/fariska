@@ -1,8 +1,6 @@
-package com.fufa.fariska.entities;
+package com.fufa.fariska.entity;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;

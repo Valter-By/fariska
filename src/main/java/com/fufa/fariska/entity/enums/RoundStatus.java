@@ -1,4 +1,4 @@
-package com.fufa.fariska.entities.enums;
+package com.fufa.fariska.entity.enums;
 
 public enum RoundStatus {
     DEALING,

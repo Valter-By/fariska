@@ -1,9 +1,7 @@
 package com.fufa.fariska.utils;
 
-import com.fufa.fariska.dto.PlayerCardsDto;
 import com.fufa.fariska.dto.PlayerDto;
-import com.fufa.fariska.entities.Card;
-import com.fufa.fariska.entities.Player;
+import com.fufa.fariska.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;

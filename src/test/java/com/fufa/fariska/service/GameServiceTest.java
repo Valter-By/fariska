@@ -1,15 +1,15 @@
-package com.fufa.fariska.services;
+package com.fufa.fariska.service;
 
 
 import com.fufa.fariska.dto.GameRequestDto;
 import com.fufa.fariska.dto.MoveRequestDto;
 import com.fufa.fariska.dto.SecretRequestDto;
 import com.fufa.fariska.dto.VoteRequestDto;
-import com.fufa.fariska.entities.*;
-import com.fufa.fariska.entities.enums.Avatar;
-import com.fufa.fariska.entities.enums.GameStatus;
-import com.fufa.fariska.entities.enums.RoundStatus;
-import com.fufa.fariska.repositories.PackRepository;
+import com.fufa.fariska.entity.*;
+import com.fufa.fariska.entity.enums.Avatar;
+import com.fufa.fariska.entity.enums.GameStatus;
+import com.fufa.fariska.entity.enums.RoundStatus;
+import com.fufa.fariska.repository.PackRepository;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
@@ -33,9 +33,9 @@ public class GameServiceTest {
 
     List<Card> cards1;
     List<Card> cards2;
-    User user;
-    User user2;
-    User user3;
+    GameUser user;
+    GameUser user2;
+    GameUser user3;
 
     @BeforeEach
     public synchronized void makeData() {
@@ -73,15 +73,15 @@ public class GameServiceTest {
                 .cardHandNumber(4)
                 .build();
 
-        user = User.builder()
+        user = GameUser.builder()
                 .nickname("Fufa")
                 .id(1)
                 .build();
-        user2 = User.builder()
+        user2 = GameUser.builder()
                 .nickname("Fariska")
                 .id(2)
                 .build();
-        user3 = User.builder()
+        user3 = GameUser.builder()
                 .nickname("Fedora")
                 .id(3)
                 .build();

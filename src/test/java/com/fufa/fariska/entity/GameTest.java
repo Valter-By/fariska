@@ -1,8 +1,8 @@
-package com.fufa.fariska.entities;
+package com.fufa.fariska.entity;
 
-import com.fufa.fariska.entities.enums.Avatar;
-import com.fufa.fariska.entities.enums.GameStatus;
-import com.fufa.fariska.repositories.CardRepository;
+import com.fufa.fariska.entity.enums.Avatar;
+import com.fufa.fariska.entity.enums.GameStatus;
+import com.fufa.fariska.repository.CardRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

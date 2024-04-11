@@ -1,12 +1,8 @@
 package com.fufa.fariska.dto;
 
-import com.fufa.fariska.entities.Card;
-import com.fufa.fariska.entities.User;
-import com.fufa.fariska.entities.enums.Avatar;
+import com.fufa.fariska.entity.enums.Avatar;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
-
-import java.util.List;
 
 @SuperBuilder
 @Data

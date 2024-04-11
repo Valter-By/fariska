@@ -1,9 +1,7 @@
-package com.fufa.fariska.entities;
+package com.fufa.fariska.entity;
 
-import com.fufa.fariska.dto.GameDto;
-import com.fufa.fariska.dto.PlayerCardsDto;
 import com.fufa.fariska.dto.RoundDto;
-import com.fufa.fariska.entities.enums.RoundStatus;
+import com.fufa.fariska.entity.enums.RoundStatus;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
