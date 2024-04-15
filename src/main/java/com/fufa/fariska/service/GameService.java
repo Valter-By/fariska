@@ -21,7 +21,7 @@ public class GameService {
 
     public synchronized Game makeNewGame(GameUser user, GameRequestDto gameRequestDto) {
 
-        int gameId = ++Game.totalGames;
+        Integer gameId = ++Game.totalGames;
 
 //        Set<Integer> packsId = gameRequestDto.getPacksId();
         Integer packsId = gameRequestDto.getPacksId();
@@ -33,7 +33,7 @@ public class GameService {
                 .createTime(Instant.now())
                 .creator(user)
                 .status(GameStatus.WAITING_FOR_PLAYERS)
-//                .currentRound(Round.builder().number(0).build())
+                .currentRound(Round.builder().number(0).build())
                 .packsId(packsId)
                 .cards(cards)
                 .freeAvatars(Avatar.getAll())
@@ -44,6 +44,7 @@ public class GameService {
                 .user(user)
                 .gameId(gameId)
                 .avatar(game.getFreeAvatar())
+                .nick(user.getNickname())
                 .build());
         game.setPlayers(players);
 
@@ -52,7 +53,7 @@ public class GameService {
         return game;
     }
 
-    public Game findGame(final int id) {
+    public Game findGame(final Integer id) {
         return createdGames.get(id);
     }
 
@@ -60,23 +61,26 @@ public class GameService {
         return this.createdGames.keySet();
     }
 
-    public synchronized Player joinNewPlayer(GameUser user, int gameId) {
+    public synchronized Player joinNewPlayer(GameUser user, Integer gameId) {
         Game game = createdGames.get(gameId);
+        int n = game.getPlayers().size();
 
-        if (game.getPlayers().size() >= 9 || game.getStatus() == GameStatus.GAME_OVER) {
+        if (n >= 9 || game.getStatus() == GameStatus.GAME_OVER) {
             return null;                                     // make exception
         }
         Player player = Player.builder()
                 .user(user)
                 .gameId(gameId)
+                .place(n)
                 .avatar(game.getFreeAvatar())
+                .nick(user.getNickname())
                 .build();
         List<Player> players = game.getPlayers();
         players.add(player);
         return player;
     }
 
-    public synchronized Game startGame(GameUser user, int gameId) {
+    public synchronized Game startGame(GameUser user, Integer gameId) {
 
         Game game = createdGames.get(gameId);
         if (user.getId() != game.getCreator().getId()
@@ -101,15 +105,15 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game makeSecret(GameUser user, int gameId, SecretRequestDto secretRequestDto) {
+    public synchronized Game makeSecret(GameUser user, Integer gameId, SecretRequestDto secretRequestDto) {
 
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
         Player leader = round.getLeader();
-        int leaderPlace = game.getLeader();
+        Integer leaderPlace = game.getLeader();
 
         if (!Objects.equals(leader.getUser(), user)
-                || round.getNumber() != secretRequestDto.getRound() || game.getStatus() != GameStatus.PLAYING) {
+                || !Objects.equals(round.getNumber(), secretRequestDto.getRound()) || game.getStatus() != GameStatus.PLAYING) {
             return null;                                     // make exception
         }
 
@@ -130,11 +134,11 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game makeMove(GameUser user, int gameId, MoveRequestDto moveRequestDto) {
+    public synchronized Game makeMove(GameUser user, Integer gameId, MoveRequestDto moveRequestDto) {
 
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
-        int place = moveRequestDto.getPlayerPlace();
+        Integer place = moveRequestDto.getPlayerPlace();
         List<Player> players = game.getPlayers();
         Player player = players.get(place);
 
@@ -162,11 +166,11 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game makeVote(GameUser user, int gameId, VoteRequestDto voteRequestDto) {
+    public synchronized Game makeVote(GameUser user, Integer gameId, VoteRequestDto voteRequestDto) {
 
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
-        int place = voteRequestDto.getPlayerPlace();
+        Integer place = voteRequestDto.getPlayerPlace();
 
         if (game.getPlayers().get(place).getUser().getId() != user.getId()) {
             return null;                                     // make exception
@@ -203,7 +207,7 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game startNextRound(GameUser user, int gameId) {
+    public synchronized Game startNextRound(GameUser user, Integer gameId) {
 
         Game game = createdGames.get(gameId);
         Round round = game.getCurrentRound();
@@ -219,7 +223,7 @@ public class GameService {
 
         List<Player> players = game.getPlayers();
         Player oldLeader = players.get(game.getLeader());
-        int nextLeaderPlace = game.getNextLeader();
+        Integer nextLeaderPlace = game.getNextLeader();
         Player nextLeader = players.get(nextLeaderPlace);
         oldLeader.setLeader(false);
         nextLeader.setLeader(true);
@@ -235,7 +239,7 @@ public class GameService {
         return game;
     }
 
-    public synchronized Game deleteGame(GameUser user, int gameId) {
+    public synchronized Game deleteGame(GameUser user, Integer gameId) {
 
         Game game = createdGames.get(gameId);
         if (user.getId() != game.getCreator().getId()) {
@@ -244,8 +248,6 @@ public class GameService {
             return createdGames.remove(gameId);
         }
     }
-
-
 
 
     private synchronized LinkedList<Card> collectAllCardsAndShuffle(List<Pack> packs) {

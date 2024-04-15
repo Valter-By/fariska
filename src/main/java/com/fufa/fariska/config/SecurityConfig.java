@@ -61,8 +61,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/hello", "/user/new", "/user/all", "/user/**").permitAll()
-                        .requestMatchers("/games").authenticated()
+                        .requestMatchers("/game/**", "/game/join/**", "/hello", "/user/new", "/user/all", "/user/**").permitAll()
+//                        .requestMatchers("/game/**").authenticated()
                         .requestMatchers("/admin").authenticated()
                         .requestMatchers("/admin").hasAnyRole("ADMIN")
                         )

@@ -8,8 +8,8 @@ import java.io.File;
 @SuperBuilder
 @Data
 public class Card {
-    private int packId;
-    private int number;
+    private Integer packId;
+    private Integer number;
     private String name;
     private File picture;
 }

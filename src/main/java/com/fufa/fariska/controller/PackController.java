@@ -14,7 +14,7 @@
 //    }
 //
 //    @GetMapping("/packs/{id}")
-//    public String getPack(@PathVariable int id) {
+//    public String getPack(@PathVariable Integer id) {
 //        return "Pack " + id;
 //    }
 //

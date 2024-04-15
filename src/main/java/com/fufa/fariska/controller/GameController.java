@@ -1,5 +1,6 @@
 package com.fufa.fariska.controller;
 
+import com.fufa.fariska.config.GameUserDetails;
 import com.fufa.fariska.dto.*;
 import com.fufa.fariska.entity.GameUser;
 import com.fufa.fariska.service.GameService;
@@ -7,15 +8,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
 @RestController
+@RequestMapping("game")
 @RequiredArgsConstructor
 public class GameController {
 
-    public final GameService gameService;
+    private GameService gameService;
 
     @GetMapping("/hello")
     public String hello() {
@@ -29,78 +32,80 @@ public class GameController {
     }
 
     @CrossOrigin
-    @GetMapping("/games")
+    @GetMapping("/all")
 //    @PreAuthorize("hasAuthority('ROLE_USER')")
     public Set<Integer> getCreatedGames() {
         return gameService.findAllCreatedGames(); // may be return some game's info in Map by id
     }
 
     @CrossOrigin
-    @GetMapping("/games/{id}")
-    public GameDto getGame(@PathVariable("id") final int id) {
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER')")
+    public GameDto getGame(@PathVariable("id") final Integer id) {
         return gameService.findGame(id).makeDto();
     }
 
     //get current round separately from a game
     @CrossOrigin
-    @GetMapping("/games/{id}/round")
-    public RoundDto getRound(@PathVariable("id") final int id) {
+    @GetMapping("/round/{id}")
+    public RoundDto getRound(@PathVariable("id") final Integer id) {
         return gameService.findGame(id).getCurrentRound().makeDto();
     }
 
     @CrossOrigin
-    @GetMapping("/games/{id}/my-cards/{place}")
-    public PlayerCardsDto getHandCards(@PathVariable("id") final int id, @PathVariable("place") final int place) {
+    @GetMapping("/my-cards/{id}/{place}") //can make by AuthenticationPrincipal and to store user's places
+    public PlayerCardsDto getHandCards(@PathVariable("id") final Integer id, @PathVariable("place") final Integer place) {
         return gameService.findGame(id).getPlayers().get(place).makePlayerCardsDto();
     }
 
-    @PostMapping("/games")
-    public GameDto createGame(@Valid @RequestBody GameRequestDto gameRequestDto) { //@AuthenticationPrincipal User user // GameDto
-        return gameService.makeNewGame(GameUser.builder().id(17).nickname("Nick").build(), gameRequestDto).makeDto();
+    @PostMapping
+    public GameDto createGame(@Valid @RequestBody GameRequestDto gameRequestDto,
+                              @AuthenticationPrincipal GameUserDetails userDetails) { // GameDto
+        return gameService.makeNewGame(userDetails.getUser(), gameRequestDto).makeDto(); //GameUser.builder().id(17).nickname("Nick").build()
     }
 
-    @PostMapping("/games/{id}/join")
-    public PlayerDto joinGame(@AuthenticationPrincipal GameUser user, @PathVariable int gameId) {
+    @PostMapping("/join/{id}")
+    public PlayerDto joinGame(@AuthenticationPrincipal GameUserDetails userDetails, @PathVariable("id") Integer gameId) {
 
-        return gameService.joinNewPlayer(user, gameId).makeDto();
+        return gameService.joinNewPlayer(userDetails.getUser(), gameId).makeDto();
     }
 
-    @PostMapping("/games/{id}/start")
-    public GameDto startGame(@AuthenticationPrincipal GameUser user, @PathVariable int gameId) {
+    @PostMapping("/start/{id}")
+    public GameDto startGame(@AuthenticationPrincipal GameUserDetails userDetails, @PathVariable("id") Integer gameId) {
 
-        return gameService.startGame(user, gameId).makeDto();
+        return gameService.startGame(userDetails.getUser(), gameId).makeDto();
     }
 
-    @PostMapping("/games/{id}/secret")
-    public GameDto createSecret(@AuthenticationPrincipal GameUser user, @PathVariable int gameId,
+    @PostMapping("/secret/{id}")
+    public GameDto createSecret(@AuthenticationPrincipal GameUserDetails userDetails, @PathVariable("id") Integer gameId,
                                 @RequestBody SecretRequestDto secretRequestDto) {
 
-        return gameService.makeSecret(user, gameId, secretRequestDto).makeDto();
+        return gameService.makeSecret(userDetails.getUser(), gameId, secretRequestDto).makeDto();
     }
 
-    @PostMapping("/games/{id}/move")
-    public GameDto createMove(@AuthenticationPrincipal GameUser user, @PathVariable int gameId,
+    @PostMapping("/move/{id}")
+    public GameDto createMove(@AuthenticationPrincipal GameUserDetails userDetails, @PathVariable("id") Integer gameId,
                               @RequestBody MoveRequestDto secretRequestDto) {
 
-        return gameService.makeMove(user, gameId, secretRequestDto).makeDto();
+        return gameService.makeMove(userDetails.getUser(), gameId, secretRequestDto).makeDto();
     }
 
-    @PostMapping("/games/{id}/vote")
-    public GameDto createVote(@AuthenticationPrincipal GameUser user, @PathVariable int gameId,
+    @PostMapping("/vote/{id}")
+    public GameDto createVote(@AuthenticationPrincipal GameUserDetails userDetails, @PathVariable("id") Integer gameId,
                               @RequestBody VoteRequestDto voteRequestDto) {
 
-        return gameService.makeVote(user, gameId, voteRequestDto).makeDto();
+        return gameService.makeVote(userDetails.getUser(), gameId, voteRequestDto).makeDto();
     }
 
-    @PostMapping("/games/{id}/next")
-    public GameDto createNextRound(@AuthenticationPrincipal GameUser user, @PathVariable int gameId) {
+    @PostMapping("/next/{id}")
+    public GameDto createNextRound(@AuthenticationPrincipal GameUserDetails userDetails, @PathVariable("id") Integer gameId) {
 
-        return gameService.startNextRound(user, gameId).makeDto();
+        return gameService.startNextRound(userDetails.getUser(), gameId).makeDto();
     }
 
-    @PostMapping("/games/{id}/delete")
-    public GameDto removeGame(@AuthenticationPrincipal GameUser user, @PathVariable int gameId) {
+    @DeleteMapping("/{id}")
+    public GameDto removeGame(@AuthenticationPrincipal GameUserDetails userDetails, @PathVariable("id") Integer gameId) {
 
-        return gameService.deleteGame(user, gameId).makeDto();
+        return gameService.deleteGame(userDetails.getUser(), gameId).makeDto();
     }
 }

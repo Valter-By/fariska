@@ -12,8 +12,8 @@ import java.util.List;
 @SuperBuilder
 @Data
 public class Round {
-    private int gameId;
-    private int number;
+    private Integer gameId;
+    private Integer number;
     private Player leader;
     private Card leaderCard;
     private String secret;
@@ -24,7 +24,7 @@ public class Round {
     private RoundStatus status;
     private boolean lastRound;
 
-    public void putCardOnTable(int place, Card card, boolean isLeaderCard) {
+    public void putCardOnTable(Integer place, Card card, boolean isLeaderCard) {
         tableCards.set(place, TableCard.builder()
                 .playerPlace(place)
                 .isSecretCard(isLeaderCard)
@@ -35,8 +35,8 @@ public class Round {
         System.out.println("putCardOnTable" + card + "- from -" + place);
     }
 
-    public int findNumberLeaderCard() {
-        int ans = 0;
+    public Integer findNumberLeaderCard() {
+        Integer ans = 0;
         for (TableCard tableCard : tableCards) {
             if (tableCard.isSecretCard()) {
                 return ans;
@@ -46,8 +46,8 @@ public class Round {
         return -1;
     }
 
-    public int findNumberNoLeaderCardNoPlayer(int playerPlace) {
-        int ans = 0;
+    public Integer findNumberNoLeaderCardNoPlayer(Integer playerPlace) {
+        Integer ans = 0;
         for (TableCard tableCard : tableCards) {
             if (!tableCard.isSecretCard() && tableCard.getPlayerPlace() != playerPlace) {
                 return ans;
@@ -57,11 +57,11 @@ public class Round {
         return -1;
     }
 
-    public boolean didPlayerMakeMove(int place) {
+    public boolean didPlayerMakeMove(Integer place) {
         return !(tableCards.get(place) == null);
     }
 
-    public boolean didPlayerMakeVote(int place) {
+    public boolean didPlayerMakeVote(Integer place) {
         //check if player made vote
         return false;
     }
@@ -80,7 +80,7 @@ public class Round {
         int number = tableCards.size();
         playerPoints = new int[number];
 
-        int leaderCardNumber = findNumberLeaderCard();
+        Integer leaderCardNumber = findNumberLeaderCard();
         int numberGuessedLeaderCard = tableCards.get(leaderCardNumber).getVotes().size();
 
         for (TableCard tableCard : tableCards) {

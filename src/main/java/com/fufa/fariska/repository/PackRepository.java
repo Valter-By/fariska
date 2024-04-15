@@ -18,7 +18,7 @@ public class PackRepository {
         //basic packs
         LinkedList<Card> cards1 = new LinkedList<>();
         LinkedList<Card> cards2 = new LinkedList<>();
-        for (int i = 0; i < 50; i++) {
+        for (Integer i = 0; i < 50; i++) {
             cards1.add(Card.builder()
                     .packId(0)
                     .number(i)

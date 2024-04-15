@@ -8,8 +8,8 @@ import java.util.List;
 @SuperBuilder
 @Data
 public class Pack {
-    private int id;
-    private int ownerId;
+    private Integer id;
+    private Integer ownerId;
     private List<Card> cards;
     private String name;
 }

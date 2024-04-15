@@ -8,6 +8,6 @@ import java.io.File;
 @SuperBuilder
 @Data
 public class CardDto {
-    private int packId;
-    private int number;
+    private Integer packId;
+    private Integer number;
 }

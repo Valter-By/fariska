@@ -7,8 +7,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Data
 public class PlayerDto {
-    private int gameId; //is required?
+    private Integer gameId; //is required?
     private int place;
     private Avatar avatar;
+    private String nick;
     private int points;
 }

@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Data
 public class MoveRequestDto {
-    private int round;
-    private int playerPlace;
-    private int cardHandNumber;
+    private Integer round;
+    private Integer playerPlace;
+    private Integer cardHandNumber;
 }

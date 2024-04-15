@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class TableCard {
 
-    private int playerPlace;
+    private Integer playerPlace;
     private boolean isSecretCard;
     private Card card;
     private List<Integer> votes;

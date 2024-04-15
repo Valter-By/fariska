@@ -44,11 +44,11 @@ public class CardRepository {
         }
         allPacksCard.add(secondPack);
     }
-    public Card getCard(int packId, int cardNumber) {
+    public Card getCard(Integer packId, Integer cardNumber) {
         return allPacksCard.get(packId).get(cardNumber);
     }
 
-    public LinkedList<Card> getOnePackCards(int packId) {
+    public LinkedList<Card> getOnePackCards(Integer packId) {
         return allPacksCard.get(packId);
     }
 

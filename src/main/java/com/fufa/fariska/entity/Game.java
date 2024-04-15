@@ -18,13 +18,13 @@ public class Game {
 
     public static Integer totalGames = 0;
 
-    private int id;
+    private Integer id;
     private Instant createTime;
     private GameUser creator;
     private GameStatus status;
     private List<Player> players;
     private Round currentRound;
-    private int leader;
+    private Integer leader;
 //    private Set<Integer> packsId;
     private Integer packsId;
     private LinkedList<Card> cards;
@@ -92,7 +92,7 @@ public class Game {
                 .create_time(createTime)
                 .status(status)
                 .players(makeListPlayerDto(players))
-                .currentRound(currentRound.getNumber())
+                .currentRound(currentRound == null ? 0 : currentRound.getNumber())
                 .leader(leader)
                 .build();
     }

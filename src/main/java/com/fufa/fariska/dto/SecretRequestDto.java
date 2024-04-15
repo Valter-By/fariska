@@ -1,13 +1,15 @@
 package com.fufa.fariska.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Data
+@NoArgsConstructor
 public class SecretRequestDto {
 
-    private int round;
+    private Integer round;
     private String secret;
-    private int cardHandNumber;
+    private Integer cardHandNumber;
 }

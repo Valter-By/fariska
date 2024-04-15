@@ -11,13 +11,13 @@ import java.util.List;
 @SuperBuilder
 @Data
 public class RoundDto {
-    private int gameId;
-    private int number;
+    private Integer gameId;
+    private Integer number;
     private Card leaderCard;
     private List<TableCard> tableCards;
     private String secret;
-    private int numberMoves;
-    private int numberVotes;
+    private Integer numberMoves;
+    private Integer numberVotes;
     private int[] playerPoints;
     private RoundStatus status;
     private boolean lastRound;

@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Data
 public class VoteRequestDto {
-    private int round;
-    private int playerPlace;
-    private int cardTableNumber;
+    private Integer round;
+    private Integer playerPlace;
+    private Integer cardTableNumber;
 }

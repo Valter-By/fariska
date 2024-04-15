@@ -12,9 +12,10 @@ import java.util.List;
 @Data
 public class Player {
     private GameUser user;
-    private int gameId;
+    private Integer gameId;
     private int place;
     private Avatar avatar;
+    private String nick;
     private List<Card> handCards;
     private boolean isLeader;
     private int points;
@@ -36,6 +37,7 @@ public class Player {
                 .gameId(gameId)
                 .place(place)
                 .avatar(avatar)
+                .nick(nick)
                 .points(points)
                 .build();
     }
